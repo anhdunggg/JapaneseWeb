@@ -11,6 +11,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import LessonContentManager from '../components/LessonContentManager';
+import QuizPanel from '../components/QuizPanel';
 import { getPlaceholderLabel, isPlaceholderImage } from '../lib/imageUtils';
 
 function pick(item, keys, fallback = '') {
@@ -135,6 +137,7 @@ export default function LessonDetail() {
   const [vocabulary, setVocabulary] = useState([]);
   const [grammar, setGrammar] = useState([]);
   const [kanji, setKanji] = useState([]);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -179,7 +182,7 @@ export default function LessonDetail() {
     return () => {
       mounted = false;
     };
-  }, [lessonId]);
+  }, [lessonId, refreshKey]);
 
   if (loading) {
     return (
@@ -227,6 +230,21 @@ export default function LessonDetail() {
                 </div>
               </div>
             </section>
+
+            <LessonContentManager
+              lessonId={lessonId}
+              vocabulary={vocabulary}
+              grammar={grammar}
+              kanji={kanji}
+              onChange={() => setRefreshKey((current) => current + 1)}
+            />
+
+            <QuizPanel
+              lesson={lesson}
+              vocabulary={vocabulary}
+              grammar={grammar}
+              kanji={kanji}
+            />
 
             <section className="mb-8">
               <div className="mb-4 flex items-center justify-between gap-4">

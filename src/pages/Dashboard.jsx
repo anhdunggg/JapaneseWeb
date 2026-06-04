@@ -4,11 +4,15 @@ import {
   AlertCircle,
   ArrowRight,
   BookOpenText,
+  Image,
   Layers3,
   LoaderCircle,
   LogOut,
+  Pencil,
+  Plus,
   Sparkles,
   Sprout,
+  Trash2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -36,56 +40,110 @@ function getLessonDetail(lesson) {
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const [lessons, setLessons] = useState([]);
+  const [lessonForm, setLessonForm] = useState({
+    title: '',
+    description: '',
+    jlpt_level: 'N5',
+  });
+  const [editingLessonId, setEditingLessonId] = useState('');
   const [counts, setCounts] = useState({
     vocabulary: 0,
     grammar: 0,
     kanji: 0,
   });
   const [loadingLessons, setLoadingLessons] = useState(true);
+  const [savingLesson, setSavingLesson] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    let mounted = true;
+  async function loadDashboard() {
+    setLoadingLessons(true);
+    setError('');
 
-    async function loadDashboard() {
-      setLoadingLessons(true);
-      setError('');
+    const [
+      lessonsResult,
+      vocabularyResult,
+      grammarResult,
+      kanjiResult,
+    ] = await Promise.all([
+      supabase.from('lessons').select('*').order('created_at', { ascending: false }),
+      supabase.from('vocabulary').select('id', { count: 'exact', head: true }),
+      supabase.from('grammar').select('id', { count: 'exact', head: true }),
+      supabase.from('kanji').select('id', { count: 'exact', head: true }),
+    ]);
 
-      const [
-        lessonsResult,
-        vocabularyResult,
-        grammarResult,
-        kanjiResult,
-      ] = await Promise.all([
-        supabase.from('lessons').select('*'),
-        supabase.from('vocabulary').select('id', { count: 'exact', head: true }),
-        supabase.from('grammar').select('id', { count: 'exact', head: true }),
-        supabase.from('kanji').select('id', { count: 'exact', head: true }),
-      ]);
-
-      if (!mounted) return;
-
-      if (lessonsResult.error) {
-        setError(lessonsResult.error.message);
-        setLoadingLessons(false);
-        return;
-      }
-
-      setLessons(lessonsResult.data ?? []);
-      setCounts({
-        vocabulary: vocabularyResult.count ?? 0,
-        grammar: grammarResult.count ?? 0,
-        kanji: kanjiResult.count ?? 0,
-      });
+    if (lessonsResult.error) {
+      setError(lessonsResult.error.message);
       setLoadingLessons(false);
+      return;
+    }
+
+    setLessons(lessonsResult.data ?? []);
+    setCounts({
+      vocabulary: vocabularyResult.count ?? 0,
+      grammar: grammarResult.count ?? 0,
+      kanji: kanjiResult.count ?? 0,
+    });
+    setLoadingLessons(false);
+  }
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  function resetLessonForm() {
+    setLessonForm({ title: '', description: '', jlpt_level: 'N5' });
+    setEditingLessonId('');
+  }
+
+  function editLesson(lesson) {
+    setEditingLessonId(lesson.id);
+    setLessonForm({
+      title: lesson.title || '',
+      description: lesson.description || '',
+      jlpt_level: lesson.jlpt_level || 'N5',
+    });
+  }
+
+  async function saveLesson(event) {
+    event.preventDefault();
+    setSavingLesson(true);
+    setError('');
+
+    const payload = {
+      title: lessonForm.title.trim(),
+      description: lessonForm.description.trim(),
+      jlpt_level: lessonForm.jlpt_level.trim() || 'N5',
+    };
+
+    const result = editingLessonId
+      ? await supabase.from('lessons').update(payload).eq('id', editingLessonId)
+      : await supabase.from('lessons').insert(payload);
+
+    setSavingLesson(false);
+
+    if (result.error) {
+      setError(result.error.message);
+      return;
+    }
+
+    resetLessonForm();
+    loadDashboard();
+  }
+
+  async function deleteLesson(lesson) {
+    const confirmed = window.confirm(`Delete "${getLessonTitle(lesson, 0)}"?`);
+    if (!confirmed) return;
+
+    setError('');
+    const { error: deleteError } = await supabase.from('lessons').delete().eq('id', lesson.id);
+
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
     }
 
     loadDashboard();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  }
 
   const summary = useMemo(
     () => [
@@ -148,6 +206,15 @@ export default function Dashboard() {
               <Sparkles className="h-7 w-7 text-vermilion" />
             </div>
           </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to="/images/review"
+              className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white px-4 py-2 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
+            >
+              <Image className="h-4 w-4" />
+              Review vocabulary images
+            </Link>
+          </div>
         </section>
 
         <section className="mb-8 grid gap-5 md:grid-cols-3">
@@ -161,6 +228,68 @@ export default function Dashboard() {
               <p className="mt-3 text-sm leading-6 text-ink/70">{item.detail}</p>
             </article>
           ))}
+        </section>
+
+        <section className="mb-8 rounded bg-white/90 p-6 shadow-zen ring-1 ring-indigo/5">
+          <div className="mb-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+              Lesson management
+            </p>
+            <h2 className="mt-2 font-mincho text-3xl">
+              {editingLessonId ? 'Edit Lesson' : 'Create Lesson'}
+            </h2>
+          </div>
+          <form onSubmit={saveLesson} className="grid gap-4 lg:grid-cols-[1fr_1fr_120px_auto]">
+            <input
+              className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+              value={lessonForm.title}
+              onChange={(event) =>
+                setLessonForm((current) => ({ ...current, title: event.target.value }))
+              }
+              placeholder="Lesson title"
+              required
+            />
+            <input
+              className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+              value={lessonForm.description}
+              onChange={(event) =>
+                setLessonForm((current) => ({ ...current, description: event.target.value }))
+              }
+              placeholder="Short description"
+            />
+            <select
+              className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+              value={lessonForm.jlpt_level}
+              onChange={(event) =>
+                setLessonForm((current) => ({ ...current, jlpt_level: event.target.value }))
+              }
+            >
+              {['N5', 'N4', 'N3', 'N2', 'N1'].map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={savingLesson}
+                className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
+              >
+                {savingLesson ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                {editingLessonId ? 'Save' : 'Create'}
+              </button>
+              {editingLessonId ? (
+                <button
+                  type="button"
+                  onClick={resetLessonForm}
+                  className="rounded border border-indigo/10 px-4 py-3 text-sm font-semibold text-indigo"
+                >
+                  Cancel
+                </button>
+              ) : null}
+            </div>
+          </form>
         </section>
 
         <section>
@@ -196,32 +325,51 @@ export default function Dashboard() {
           {!error && lessons.length > 0 ? (
             <div className="grid gap-5 md:grid-cols-2">
               {lessons.map((lesson, index) => (
-                <Link
+                <article
                   key={lesson.id ?? getLessonTitle(lesson, index)}
-                  to={`/lessons/${lesson.id}`}
                   className="rounded bg-white/90 p-6 shadow-soft ring-1 ring-indigo/5 transition hover:-translate-y-0.5 hover:shadow-zen"
                 >
-                  <div className="mb-4 flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">
-                        {lesson.level || lesson.category || lesson.type || 'Lesson'}
-                      </p>
-                      <h3 className="mt-2 font-mincho text-2xl text-indigo">
-                        {getLessonTitle(lesson, index)}
-                      </h3>
+                  <Link to={`/lessons/${lesson.id}`} className="block">
+                    <div className="mb-4 flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">
+                          {lesson.jlpt_level || lesson.level || lesson.category || lesson.type || 'Lesson'}
+                        </p>
+                        <h3 className="mt-2 font-mincho text-2xl text-indigo">
+                          {getLessonTitle(lesson, index)}
+                        </h3>
+                      </div>
+                      <div className="flex h-10 w-10 items-center justify-center rounded bg-mist">
+                        <Layers3 className="h-5 w-5 text-vermilion" />
+                      </div>
                     </div>
-                    <div className="flex h-10 w-10 items-center justify-center rounded bg-mist">
-                      <Layers3 className="h-5 w-5 text-vermilion" />
+                    <p className="line-clamp-3 text-sm leading-6 text-ink/75">
+                      {getLessonDetail(lesson)}
+                    </p>
+                    <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
+                      Start lesson
+                      <ArrowRight className="h-4 w-4" />
                     </div>
+                  </Link>
+                  <div className="mt-5 flex gap-2 border-t border-indigo/10 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => editLesson(lesson)}
+                      className="inline-flex items-center gap-2 rounded border border-indigo/10 px-3 py-2 text-sm font-semibold text-indigo"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteLesson(lesson)}
+                      className="inline-flex items-center gap-2 rounded border border-vermilion/20 px-3 py-2 text-sm font-semibold text-vermilion"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </button>
                   </div>
-                  <p className="line-clamp-3 text-sm leading-6 text-ink/75">
-                    {getLessonDetail(lesson)}
-                  </p>
-                  <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
-                    Start lesson
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
-                </Link>
+                </article>
               ))}
             </div>
           ) : null}

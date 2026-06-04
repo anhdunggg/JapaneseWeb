@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
+import ImageReview from './pages/ImageReview';
 import LessonDetail from './pages/LessonDetail';
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/images/review" element={<ImageReview />} />
         <Route path="/lessons/:lessonId" element={<LessonDetail />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
