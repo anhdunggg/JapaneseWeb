@@ -155,7 +155,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
   }
 
   return (
-    <section className="mb-8 rounded bg-white/90 p-6 shadow-zen ring-1 ring-indigo/5">
+    <section className="zen-glass mb-8 p-6">
       <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
@@ -176,7 +176,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
               type="button"
               onClick={handleGenerateBank}
               disabled={generatingBank}
-              className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura disabled:opacity-70"
+              className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura disabled:opacity-70"
             >
               {generatingBank ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <DatabaseZap className="h-4 w-4" />}
               Generate bank with AI
@@ -186,7 +186,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
             type="button"
             onClick={handleCreateQuiz}
             disabled={creatingQuiz || loadingBank}
-            className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95 disabled:opacity-70"
+            className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95 disabled:opacity-70"
           >
             {creatingQuiz ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Shuffle className="h-4 w-4" />}
             Create random quiz
@@ -213,7 +213,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
           {quiz.questions.map((question, index) => {
             const isCorrect = normalizeAnswer(answers[question.id]) === normalizeAnswer(question.answer);
             return (
-              <article key={question.id} className="rounded border border-indigo/10 bg-white p-4">
+              <article key={question.id} className="zen-hover rounded border border-indigo/10 bg-white/85 p-4 shadow-soft">
                 <div className="mb-3 flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
@@ -273,7 +273,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
             <button
               type="button"
               onClick={() => setShowResult(true)}
-              className="rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
+              className="zen-shimmer rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
             >
               Check answers
             </button>
@@ -281,7 +281,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
               type="button"
               onClick={handleSave}
               disabled={!showResult || saving}
-              className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
+              className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
             >
               {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Save attempt

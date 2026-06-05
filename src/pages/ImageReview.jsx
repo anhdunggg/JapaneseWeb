@@ -58,7 +58,7 @@ export default function ImageReview() {
   }
 
   return (
-    <main className="min-h-screen bg-washi px-5 py-6 text-indigo sm:px-8">
+    <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
         <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
           <ArrowLeft className="h-4 w-4" />
@@ -66,7 +66,7 @@ export default function ImageReview() {
         </Link>
 
         {!isAdmin ? (
-          <section className="rounded bg-white/90 p-7 shadow-zen ring-1 ring-indigo/5">
+          <section className="zen-glass p-7">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
               Admin only
             </p>
@@ -76,7 +76,7 @@ export default function ImageReview() {
 
         {isAdmin ? (
         <>
-        <section className="mb-6 rounded bg-white/90 p-7 shadow-zen ring-1 ring-indigo/5">
+        <section className="zen-glass mb-6 p-7">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">Vocabulary images</p>
@@ -88,7 +88,7 @@ export default function ImageReview() {
             <button
               type="button"
               onClick={loadItems}
-              className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
+              className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
             >
               <RefreshCw className="h-4 w-4" />
               Refresh
@@ -104,14 +104,14 @@ export default function ImageReview() {
         ) : null}
 
         {loading ? (
-          <div className="flex items-center gap-3 rounded bg-white/80 px-5 py-4 shadow-soft">
+          <div className="zen-glass flex items-center gap-3 px-5 py-4">
             <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
             Loading images...
           </div>
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {items.map((item) => (
-              <article key={item.id} className="rounded bg-white/90 p-5 shadow-soft ring-1 ring-indigo/5">
+              <article key={item.id} className="zen-glass zen-hover p-5">
                 {item.image_url && !isPlaceholderImage(item.image_url) ? (
                   <img src={item.image_url} alt={item.word} className="h-44 w-full rounded object-cover" loading="lazy" />
                 ) : (
@@ -138,7 +138,7 @@ export default function ImageReview() {
                     type="button"
                     onClick={() => updateImage(item, item.draft_url)}
                     disabled={savingId === item.id}
-                    className="inline-flex flex-1 items-center justify-center gap-2 rounded bg-indigo px-3 py-2 text-sm font-semibold text-washi disabled:opacity-60"
+                    className="zen-shimmer inline-flex flex-1 items-center justify-center gap-2 rounded bg-indigo px-3 py-2 text-sm font-semibold text-washi disabled:opacity-60"
                   >
                     {savingId === item.id ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                     Save

@@ -133,7 +133,7 @@ export default function LessonContentManager({
   }
 
   return (
-    <section className="mb-8 rounded bg-white/90 p-6 shadow-zen ring-1 ring-indigo/5">
+    <section className="zen-glass mb-8 p-6">
       <div className="mb-5">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
           Lesson content CRUD
@@ -150,7 +150,7 @@ export default function LessonContentManager({
               setActive(table);
               reset(table);
             }}
-            className={`rounded px-4 py-2 text-sm font-semibold capitalize ${
+            className={`zen-hover rounded px-4 py-2 text-sm font-semibold capitalize ${
               active === table ? 'bg-indigo text-washi' : 'bg-washi text-indigo'
             }`}
           >
@@ -204,7 +204,7 @@ export default function LessonContentManager({
           <button
             type="submit"
             disabled={saving}
-            className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
+            className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
           >
             {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             {editing.table === active && editing.id ? 'Save changes' : 'Add item'}

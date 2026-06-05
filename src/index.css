@@ -20,7 +20,10 @@ body {
   min-height: 100vh;
   margin: 0;
   background:
-    linear-gradient(rgba(253, 251, 247, 0.92), rgba(253, 251, 247, 0.96)),
+    radial-gradient(circle at 12% 8%, rgba(255, 183, 197, 0.24), transparent 28rem),
+    radial-gradient(circle at 90% 18%, rgba(230, 126, 34, 0.16), transparent 30rem),
+    radial-gradient(circle at 48% 100%, rgba(44, 62, 80, 0.08), transparent 30rem),
+    linear-gradient(rgba(253, 251, 247, 0.9), rgba(253, 251, 247, 0.97)),
     repeating-linear-gradient(
       90deg,
       rgba(44, 62, 80, 0.025) 0,
@@ -29,6 +32,19 @@ body {
       transparent 7px
     );
   color: #2c3e50;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(44, 62, 80, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44, 62, 80, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
 }
 
 button,
@@ -41,4 +57,71 @@ input:focus-visible,
 a:focus-visible {
   outline: 3px solid rgba(255, 183, 197, 0.7);
   outline-offset: 3px;
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0) scale(1.03);
+  }
+}
+
+@keyframes shimmer-line {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@layer components {
+  .zen-glass {
+    @apply relative overflow-hidden rounded bg-white/85 shadow-zen ring-1 ring-indigo/5 backdrop-blur transition duration-300;
+  }
+
+  .zen-glass::after {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    content: "";
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.62), transparent 38%);
+  }
+
+  .zen-glass > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .zen-hover {
+    @apply transition duration-300 hover:-translate-y-1.5 hover:shadow-zen hover:ring-sakura/50;
+  }
+
+  .zen-shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .zen-shimmer::before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 46%;
+    content: "";
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+    transform: translateX(-120%);
+  }
+
+  .zen-shimmer:hover::before {
+    animation: shimmer-line 0.85s ease;
+  }
+
+  .zen-float {
+    animation: float-soft 8s ease-in-out infinite;
+  }
 }

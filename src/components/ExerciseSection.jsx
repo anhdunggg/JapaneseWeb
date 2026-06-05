@@ -123,7 +123,7 @@ export default function ExerciseSection({ exercises }) {
 
   if (exercises.length === 0) {
     return (
-      <section className="mb-8 rounded bg-white/90 p-6 shadow-soft ring-1 ring-indigo/5">
+      <section className="zen-glass mb-8 p-6">
         <h2 className="font-mincho text-3xl">Exercises</h2>
         <p className="mt-3 text-sm text-ink/70">No exercises have been added for this lesson yet.</p>
       </section>
@@ -148,7 +148,7 @@ export default function ExerciseSection({ exercises }) {
             const questions = parseQuestions(exercise.questions);
             const checked = checkedExerciseId === exercise.id;
             return (
-              <article key={exercise.id} className="rounded bg-white/90 p-6 shadow-zen ring-1 ring-indigo/5">
+              <article key={exercise.id} className="zen-glass zen-hover p-6">
                 <div className="mb-5 flex items-start gap-4">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-sakura/25">
                     <Icon className="h-5 w-5 text-vermilion" />
@@ -174,7 +174,7 @@ export default function ExerciseSection({ exercises }) {
                       <button
                         type="button"
                         onClick={() => speakExercise(exercise)}
-                        className="inline-flex items-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
+                        className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
                       >
                         <Volume2 className="h-4 w-4" />
                         Play listening audio
@@ -222,7 +222,7 @@ export default function ExerciseSection({ exercises }) {
                       normalizeAnswer(answerValue) === normalizeAnswer(answerKey[key]);
 
                     return (
-                      <div key={key} className="rounded border border-indigo/10 bg-white p-4">
+                      <div key={key} className="zen-hover rounded border border-indigo/10 bg-white/85 p-4 shadow-soft">
                         <div className="mb-3 flex items-start justify-between gap-4">
                           <p className="font-semibold text-indigo">
                             {index + 1}. {question.prompt}
@@ -279,7 +279,7 @@ export default function ExerciseSection({ exercises }) {
                     <button
                       type="button"
                       onClick={() => setCheckedExerciseId(exercise.id)}
-                      className="rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
+                      className="zen-shimmer rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
                     >
                       Check exercise
                     </button>
@@ -287,7 +287,7 @@ export default function ExerciseSection({ exercises }) {
                       type="button"
                       onClick={() => saveAttempt(exercise)}
                       disabled={savingId === exercise.id || checkedExerciseId !== exercise.id}
-                      className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
+                      className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
                     >
                       {savingId === exercise.id ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                       Save attempt

@@ -97,7 +97,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
   }
 
   return (
-    <section className="mb-8 rounded bg-white/90 p-6 shadow-zen ring-1 ring-indigo/5">
+    <section className="zen-glass mb-8 p-6">
       <div className="mb-5">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
           Exercise management
@@ -124,7 +124,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
           <textarea className={`${fieldClass()} min-h-44 font-mono`} value={form.answerKeyText} onChange={(event) => updateField('answerKeyText', event.target.value)} placeholder="Answer key JSON" />
         </div>
         <div className="flex gap-2">
-          <button type="submit" disabled={saving} className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60">
+          <button type="submit" disabled={saving} className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60">
             {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
             {editingId ? 'Save exercise' : 'Add exercise'}
           </button>

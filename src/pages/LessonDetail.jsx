@@ -198,8 +198,8 @@ export default function LessonDetail() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-washi px-6 text-indigo">
-        <div className="flex items-center gap-3 rounded bg-white/85 px-5 py-4 shadow-soft">
+      <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
+        <div className="zen-glass flex items-center gap-3 px-5 py-4">
           <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
           <span className="text-sm font-medium">Opening lesson...</span>
         </div>
@@ -208,7 +208,7 @@ export default function LessonDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-washi px-5 py-6 text-indigo sm:px-8">
+    <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
         <Link
           to="/dashboard"
@@ -225,7 +225,7 @@ export default function LessonDetail() {
           </div>
         ) : (
           <>
-            <section className="mb-8 rounded bg-white/90 p-7 shadow-zen ring-1 ring-indigo/5">
+            <section className="zen-glass mb-8 p-7">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
@@ -237,7 +237,7 @@ export default function LessonDetail() {
                     {detailForLesson(lesson)}
                   </p>
                 </div>
-                <div className="flex h-14 w-14 items-center justify-center rounded bg-sakura/30">
+                <div className="zen-hover flex h-14 w-14 items-center justify-center rounded bg-sakura/30">
                   <Sparkles className="h-7 w-7 text-vermilion" />
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function LessonDetail() {
                   return (
                     <article
                       key={item.id}
-                      className="rounded bg-white/90 p-5 shadow-soft ring-1 ring-indigo/5"
+                      className="zen-glass zen-hover p-5"
                     >
                       <StudyImage src={item.image_url} alt={word} />
                       <div className="mt-4">
@@ -335,7 +335,7 @@ export default function LessonDetail() {
                 {grammar.map((item) => (
                   <article
                     key={item.id}
-                    className="rounded bg-white/90 p-6 shadow-soft ring-1 ring-indigo/5"
+                    className="zen-glass zen-hover p-6"
                   >
                     <h3 className="font-mincho text-2xl">
                       {pick(item, ['title', 'pattern', 'name'], 'Grammar point')}
@@ -379,7 +379,7 @@ export default function LessonDetail() {
                   return (
                     <article
                       key={item.id}
-                      className="rounded bg-white/90 p-5 shadow-soft ring-1 ring-indigo/5"
+                      className="zen-glass zen-hover p-5"
                     >
                       <div className="flex gap-4">
                         <StudyImage src={item.image_url} alt={character} compact />
