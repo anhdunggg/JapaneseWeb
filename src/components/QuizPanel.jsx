@@ -162,7 +162,6 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
             <Bot className="h-4 w-4" />
             Practice quiz
           </p>
-          <h2 className="font-mincho text-3xl">Question Bank Quiz</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/70">
             Users get a fresh random quiz from saved lesson questions. Gemini is only used by admins to expand the bank.
           </p>

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowLeft,
+  ArrowRight,
   BookOpenText,
   Brain,
   ImageOff,
@@ -11,10 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-import ExerciseManager from '../components/ExerciseManager';
-import ExerciseSection from '../components/ExerciseSection';
 import LessonContentManager from '../components/LessonContentManager';
-import QuizPanel from '../components/QuizPanel';
 import { useAuth } from '../context/AuthContext';
 import { getPlaceholderLabel, isPlaceholderImage } from '../lib/imageUtils';
 
@@ -141,7 +139,6 @@ export default function LessonDetail() {
   const [vocabulary, setVocabulary] = useState([]);
   const [grammar, setGrammar] = useState([]);
   const [kanji, setKanji] = useState([]);
-  const [exercises, setExercises] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -153,17 +150,12 @@ export default function LessonDetail() {
       setLoading(true);
       setError('');
 
-      const [lessonResult, vocabularyResult, grammarResult, kanjiResult, exercisesResult] =
+      const [lessonResult, vocabularyResult, grammarResult, kanjiResult] =
         await Promise.all([
           supabase.from('lessons').select('*').eq('id', lessonId).single(),
           supabase.from('vocabulary').select('*').eq('lesson_id', lessonId),
           supabase.from('grammar').select('*').eq('lesson_id', lessonId),
           supabase.from('kanji').select('*').eq('lesson_id', lessonId),
-          supabase
-            .from('lesson_exercises')
-            .select('*')
-            .eq('lesson_id', lessonId)
-            .order('created_at', { ascending: false }),
         ]);
 
       if (!mounted) return;
@@ -172,8 +164,7 @@ export default function LessonDetail() {
         lessonResult.error ||
         vocabularyResult.error ||
         grammarResult.error ||
-        kanjiResult.error ||
-        exercisesResult.error;
+        kanjiResult.error;
 
       if (firstError) {
         setError(firstError.message);
@@ -185,7 +176,6 @@ export default function LessonDetail() {
       setVocabulary(vocabularyResult.data ?? []);
       setGrammar(grammarResult.data ?? []);
       setKanji(kanjiResult.data ?? []);
-      setExercises(exercisesResult.data ?? []);
       setLoading(false);
     }
 
@@ -241,6 +231,15 @@ export default function LessonDetail() {
                   <Sparkles className="h-7 w-7 text-vermilion" />
                 </div>
               </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  to={`/lessons/${lessonId}/exercises`}
+                  className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95"
+                >
+                  Open exercises
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
             </section>
 
             {isAdmin ? (
@@ -252,23 +251,6 @@ export default function LessonDetail() {
                 onChange={() => setRefreshKey((current) => current + 1)}
               />
             ) : null}
-
-            {isAdmin ? (
-              <ExerciseManager
-                lessonId={lessonId}
-                exercises={exercises}
-                onChange={() => setRefreshKey((current) => current + 1)}
-              />
-            ) : null}
-
-            <QuizPanel
-              lesson={lesson}
-              vocabulary={vocabulary}
-              grammar={grammar}
-              kanji={kanji}
-            />
-
-            <ExerciseSection exercises={exercises} />
 
             <section className="mb-8">
               <div className="mb-4 flex items-center justify-between gap-4">

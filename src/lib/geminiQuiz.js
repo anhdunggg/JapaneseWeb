@@ -31,7 +31,8 @@ export function buildLessonQuizPrompt({ lesson, vocabulary, grammar, kanji }) {
 
   return `You are creating a Japanese practice quiz for a learner.
 Use ONLY the lesson content below. Do not introduce vocabulary, grammar, or kanji that is not present.
-Return Vietnamese-friendly explanations.
+Use Japanese for prompts, explanations, answer choices, and answers.
+Do not write Vietnamese or English text in generated quiz fields unless it is a fixed proper noun.
 
 Lesson: ${lesson?.title || 'Untitled lesson'}
 Description: ${lesson?.description || ''}

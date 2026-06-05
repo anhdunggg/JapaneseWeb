@@ -86,7 +86,8 @@ function buildPrompt({ lesson, vocabulary, grammar, kanji }) {
 
   return `Create original Japanese learning exercises for this lesson.
 Do not copy external materials. Use only the lesson content below.
-Return Vietnamese-friendly instructions and answer explanations where useful.
+Use Japanese for exercise titles, instructions, question prompts, answer choices, answers, and examples.
+Do not write Vietnamese or English text in generated exercise fields unless it is a fixed proper noun.
 
 Lesson: ${lesson.title}
 Description: ${lesson.description || ''}
@@ -102,9 +103,9 @@ Kanji:
 ${kanjiText || '- none'}
 
 Create exactly 3 exercises:
-1. one reading exercise with a short Japanese passage and 4 questions.
-2. one listening exercise with a short Japanese dialogue transcript in content and 4 questions. Do not include audio_url.
-3. one practice exercise with transformation/matching/translation style tasks and 5 questions.
+1. one reading exercise with a short Japanese passage and 4 Japanese questions.
+2. one listening exercise with a short Japanese dialogue transcript in content and 4 Japanese questions. Do not include audio_url.
+3. one practice exercise with transformation/matching style tasks and 5 Japanese questions.
 
 Each question must have a stable id like q1, q2, q3.
 Use choices for multiple-choice questions; use an empty choices array for free-answer questions.
