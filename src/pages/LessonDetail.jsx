@@ -11,6 +11,8 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
+import ExerciseManager from '../components/ExerciseManager';
+import ExerciseSection from '../components/ExerciseSection';
 import LessonContentManager from '../components/LessonContentManager';
 import QuizPanel from '../components/QuizPanel';
 import { useAuth } from '../context/AuthContext';
@@ -139,6 +141,7 @@ export default function LessonDetail() {
   const [vocabulary, setVocabulary] = useState([]);
   const [grammar, setGrammar] = useState([]);
   const [kanji, setKanji] = useState([]);
+  const [exercises, setExercises] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -150,12 +153,17 @@ export default function LessonDetail() {
       setLoading(true);
       setError('');
 
-      const [lessonResult, vocabularyResult, grammarResult, kanjiResult] =
+      const [lessonResult, vocabularyResult, grammarResult, kanjiResult, exercisesResult] =
         await Promise.all([
           supabase.from('lessons').select('*').eq('id', lessonId).single(),
           supabase.from('vocabulary').select('*').eq('lesson_id', lessonId),
           supabase.from('grammar').select('*').eq('lesson_id', lessonId),
           supabase.from('kanji').select('*').eq('lesson_id', lessonId),
+          supabase
+            .from('lesson_exercises')
+            .select('*')
+            .eq('lesson_id', lessonId)
+            .order('created_at', { ascending: false }),
         ]);
 
       if (!mounted) return;
@@ -164,7 +172,8 @@ export default function LessonDetail() {
         lessonResult.error ||
         vocabularyResult.error ||
         grammarResult.error ||
-        kanjiResult.error;
+        kanjiResult.error ||
+        exercisesResult.error;
 
       if (firstError) {
         setError(firstError.message);
@@ -176,6 +185,7 @@ export default function LessonDetail() {
       setVocabulary(vocabularyResult.data ?? []);
       setGrammar(grammarResult.data ?? []);
       setKanji(kanjiResult.data ?? []);
+      setExercises(exercisesResult.data ?? []);
       setLoading(false);
     }
 
@@ -243,12 +253,22 @@ export default function LessonDetail() {
               />
             ) : null}
 
+            {isAdmin ? (
+              <ExerciseManager
+                lessonId={lessonId}
+                exercises={exercises}
+                onChange={() => setRefreshKey((current) => current + 1)}
+              />
+            ) : null}
+
             <QuizPanel
               lesson={lesson}
               vocabulary={vocabulary}
               grammar={grammar}
               kanji={kanji}
             />
+
+            <ExerciseSection exercises={exercises} />
 
             <section className="mb-8">
               <div className="mb-4 flex items-center justify-between gap-4">
