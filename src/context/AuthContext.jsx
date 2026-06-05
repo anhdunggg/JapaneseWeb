@@ -66,7 +66,14 @@ export function AuthProvider({ children }) {
       isAdmin: role === 'admin',
       supabaseConfigError,
       loading,
-      signUp: (email, password) => supabase.auth.signUp({ email, password }),
+      signUp: (email, password) =>
+        supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth`,
+          },
+        }),
       signIn: (email, password) =>
         supabase.auth.signInWithPassword({ email, password }),
       signOut: () => supabase.auth.signOut(),
