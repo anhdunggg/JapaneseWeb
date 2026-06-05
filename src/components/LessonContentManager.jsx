@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react';
+import { LoaderCircle, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 const emptyForms = {
@@ -10,6 +10,8 @@ const emptyForms = {
     meaning: '',
     details: '',
     image_url: '',
+    image_position_x: 50,
+    image_position_y: 50,
   },
   grammar: {
     title: '',
@@ -25,6 +27,8 @@ const emptyForms = {
     meaning: '',
     mnemonic: '',
     image_url: '',
+    image_position_x: 50,
+    image_position_y: 50,
   },
 };
 
@@ -63,33 +67,69 @@ export default function LessonContentManager({
   onChange,
 }) {
   const [active, setActive] = useState('vocabulary');
+  const [editorTable, setEditorTable] = useState('vocabulary');
   const [forms, setForms] = useState(emptyForms);
+  const [showEditor, setShowEditor] = useState(false);
   const [editing, setEditing] = useState({ table: '', id: '' });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
 
-  const activeForm = forms[active];
   const activeItems = { vocabulary, grammar, kanji }[active];
+  const editorForm = forms[editorTable];
+  const editorItems = { vocabulary, grammar, kanji }[editorTable];
+  const isEditing = editing.table === editorTable && editing.id;
 
   function setField(field, value) {
     setForms((current) => ({
       ...current,
-      [active]: { ...current[active], [field]: value },
+      [editorTable]: { ...current[editorTable], [field]: value },
     }));
   }
 
-  function reset(table = active) {
+  function setImageFocus(event) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+    const y = Math.max(0, Math.min(100, ((event.clientY - bounds.top) / bounds.height) * 100));
+
+    setForms((current) => ({
+      ...current,
+      [editorTable]: {
+        ...current[editorTable],
+        image_position_x: Math.round(x),
+        image_position_y: Math.round(y),
+      },
+    }));
+  }
+
+  function reset(table = editorTable) {
     setForms((current) => ({ ...current, [table]: emptyForms[table] }));
     setEditing({ table: '', id: '' });
+    setShowEditor(false);
+  }
+
+  function startCreate() {
+    setEditorTable(active);
+    setForms((current) => ({ ...current, [active]: emptyForms[active] }));
+    setEditing({ table: '', id: '' });
+    setMessage('');
+    setShowEditor(true);
   }
 
   function startEdit(table, item) {
-    setActive(table);
+    setEditorTable(table);
     setEditing({ table, id: item.id });
+    setMessage(`Editing ${item.word || item.title || item.character || 'item'}.`);
+    setShowEditor(true);
     setForms((current) => ({
       ...current,
       [table]: Object.keys(emptyForms[table]).reduce(
-        (next, key) => ({ ...next, [key]: item[key] || '' }),
+        (next, key) => ({
+          ...next,
+          [key]:
+            key === 'image_position_x' || key === 'image_position_y'
+              ? item[key] ?? 50
+              : item[key] || '',
+        }),
         {},
       ),
     }));
@@ -100,11 +140,11 @@ export default function LessonContentManager({
     setSaving(true);
     setMessage('');
 
-    const payload = { ...activeForm, lesson_id: lessonId };
+    const payload = { ...editorForm, lesson_id: lessonId };
     const result =
-      editing.table === active && editing.id
-        ? await supabase.from(active).update(payload).eq('id', editing.id)
-        : await supabase.from(active).insert(payload);
+      editing.table === editorTable && editing.id
+        ? await supabase.from(editorTable).update(payload).eq('id', editing.id)
+        : await supabase.from(editorTable).insert(payload);
 
     setSaving(false);
 
@@ -113,7 +153,7 @@ export default function LessonContentManager({
       return;
     }
 
-    reset(active);
+    reset(editorTable);
     onChange();
   }
 
@@ -130,6 +170,120 @@ export default function LessonContentManager({
     }
 
     onChange();
+  }
+
+  function renderFields(form) {
+    return (
+      <>
+        {editorTable === 'vocabulary' ? (
+          <>
+            <div className="grid gap-3 md:grid-cols-4">
+              <TextInput value={form.word} onChange={(value) => setField('word', value)} placeholder="Word" required />
+              <TextInput value={form.furigana} onChange={(value) => setField('furigana', value)} placeholder="Furigana" />
+              <TextInput value={form.romaji} onChange={(value) => setField('romaji', value)} placeholder="Romaji" />
+              <TextInput value={form.meaning} onChange={(value) => setField('meaning', value)} placeholder="Meaning" required />
+            </div>
+            <TextInput value={form.image_url} onChange={(value) => setField('image_url', value)} placeholder="Image URL" />
+            <TextArea value={form.details} onChange={(value) => setField('details', value)} placeholder="Details" />
+          </>
+        ) : null}
+
+        {editorTable === 'grammar' ? (
+          <>
+            <TextInput value={form.title} onChange={(value) => setField('title', value)} placeholder="Grammar title" required />
+            <TextInput value={form.structure} onChange={(value) => setField('structure', value)} placeholder="Structure" />
+            <TextArea value={form.explanation} onChange={(value) => setField('explanation', value)} placeholder="Explanation" />
+            <div className="grid gap-3 md:grid-cols-2">
+              <TextInput value={form.example_japanese} onChange={(value) => setField('example_japanese', value)} placeholder="Example Japanese" />
+              <TextInput value={form.example_vietnamese} onChange={(value) => setField('example_vietnamese', value)} placeholder="Example Vietnamese" />
+            </div>
+          </>
+        ) : null}
+
+        {editorTable === 'kanji' ? (
+          <>
+            <div className="grid gap-3 md:grid-cols-4">
+              <TextInput value={form.character} onChange={(value) => setField('character', value)} placeholder="Kanji" required />
+              <TextInput value={form.onyomi} onChange={(value) => setField('onyomi', value)} placeholder="Onyomi" />
+              <TextInput value={form.kunyomi} onChange={(value) => setField('kunyomi', value)} placeholder="Kunyomi" />
+              <TextInput value={form.meaning} onChange={(value) => setField('meaning', value)} placeholder="Meaning" required />
+            </div>
+            <TextInput value={form.image_url} onChange={(value) => setField('image_url', value)} placeholder="Image URL" />
+            <TextArea value={form.mnemonic} onChange={(value) => setField('mnemonic', value)} placeholder="Mnemonic" />
+          </>
+        ) : null}
+      </>
+    );
+  }
+
+  function renderImagePreview(form) {
+    if (!['vocabulary', 'kanji'].includes(editorTable)) return null;
+
+    return (
+      <aside className="rounded border border-indigo/10 bg-washi p-3">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
+          Image preview
+        </p>
+        {form.image_url ? (
+          <img
+            src={form.image_url}
+            alt={form.word || form.character || 'Preview'}
+            className="h-52 w-full cursor-crosshair rounded object-cover ring-1 ring-indigo/10"
+            style={{ objectPosition: imagePositionFor(form) }}
+            onPointerDown={setImageFocus}
+            onPointerMove={(event) => {
+              if (event.buttons === 1) setImageFocus(event);
+            }}
+          />
+        ) : (
+          <div className="flex h-52 items-center justify-center rounded bg-white/80 text-sm text-ink/60 ring-1 ring-indigo/10">
+            No image URL
+          </div>
+        )}
+        <p className="mt-3 break-all text-xs leading-5 text-ink/60">
+          {form.image_url || 'Paste an image URL to preview it here.'}
+        </p>
+        {form.image_url ? (
+          <>
+            <p className="mt-3 text-xs font-semibold text-indigo">
+              Drag on the image to choose the visible area.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <label className="text-xs font-semibold text-ink/70">
+                X
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={form.image_position_x ?? 50}
+                  onChange={(event) => setField('image_position_x', Number(event.target.value))}
+                  className="mt-1 w-full"
+                />
+              </label>
+              <label className="text-xs font-semibold text-ink/70">
+                Y
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={form.image_position_y ?? 50}
+                  onChange={(event) => setField('image_position_y', Number(event.target.value))}
+                  className="mt-1 w-full"
+                />
+              </label>
+            </div>
+          </>
+        ) : null}
+      </aside>
+    );
+  }
+
+  function labelForItem(item) {
+    return item.word || item.title || item.character || 'Item';
+  }
+
+  function subLabelForItem(item) {
+    return item.meaning || item.structure || item.explanation || '';
   }
 
   return (
@@ -159,67 +313,18 @@ export default function LessonContentManager({
         ))}
       </div>
 
-      {message ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
+      {message && !showEditor ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
 
-      <form onSubmit={saveItem} className="mb-6 grid gap-3">
-        {active === 'vocabulary' ? (
-          <>
-            <div className="grid gap-3 md:grid-cols-4">
-              <TextInput value={activeForm.word} onChange={(value) => setField('word', value)} placeholder="Word" required />
-              <TextInput value={activeForm.furigana} onChange={(value) => setField('furigana', value)} placeholder="Furigana" />
-              <TextInput value={activeForm.romaji} onChange={(value) => setField('romaji', value)} placeholder="Romaji" />
-              <TextInput value={activeForm.meaning} onChange={(value) => setField('meaning', value)} placeholder="Meaning" required />
-            </div>
-            <TextInput value={activeForm.image_url} onChange={(value) => setField('image_url', value)} placeholder="Image URL" />
-            <TextArea value={activeForm.details} onChange={(value) => setField('details', value)} placeholder="Details" />
-          </>
-        ) : null}
-
-        {active === 'grammar' ? (
-          <>
-            <TextInput value={activeForm.title} onChange={(value) => setField('title', value)} placeholder="Grammar title" required />
-            <TextInput value={activeForm.structure} onChange={(value) => setField('structure', value)} placeholder="Structure" />
-            <TextArea value={activeForm.explanation} onChange={(value) => setField('explanation', value)} placeholder="Explanation" />
-            <div className="grid gap-3 md:grid-cols-2">
-              <TextInput value={activeForm.example_japanese} onChange={(value) => setField('example_japanese', value)} placeholder="Example Japanese" />
-              <TextInput value={activeForm.example_vietnamese} onChange={(value) => setField('example_vietnamese', value)} placeholder="Example Vietnamese" />
-            </div>
-          </>
-        ) : null}
-
-        {active === 'kanji' ? (
-          <>
-            <div className="grid gap-3 md:grid-cols-4">
-              <TextInput value={activeForm.character} onChange={(value) => setField('character', value)} placeholder="Kanji" required />
-              <TextInput value={activeForm.onyomi} onChange={(value) => setField('onyomi', value)} placeholder="Onyomi" />
-              <TextInput value={activeForm.kunyomi} onChange={(value) => setField('kunyomi', value)} placeholder="Kunyomi" />
-              <TextInput value={activeForm.meaning} onChange={(value) => setField('meaning', value)} placeholder="Meaning" required />
-            </div>
-            <TextInput value={activeForm.image_url} onChange={(value) => setField('image_url', value)} placeholder="Image URL" />
-            <TextArea value={activeForm.mnemonic} onChange={(value) => setField('mnemonic', value)} placeholder="Mnemonic" />
-          </>
-        ) : null}
-
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
-          >
-            {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-            {editing.table === active && editing.id ? 'Save changes' : 'Add item'}
-          </button>
-          {editing.id ? (
-            <button
-              type="button"
-              onClick={() => reset(active)}
-              className="rounded border border-indigo/10 px-4 py-3 text-sm font-semibold text-indigo"
-            >
-              Cancel
-            </button>
-          ) : null}
-        </div>
-      </form>
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={startCreate}
+          className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
+        >
+          <Plus className="h-4 w-4" />
+          Add {active}
+        </button>
+      </div>
 
       <div className="max-h-80 overflow-auto rounded border border-indigo/10">
         {activeItems.length === 0 ? (
@@ -227,13 +332,24 @@ export default function LessonContentManager({
         ) : (
           activeItems.map((item) => (
             <div key={item.id} className="flex items-center justify-between gap-4 border-b border-indigo/10 p-3 last:border-b-0">
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-indigo">
-                  {item.word || item.title || item.character}
-                </p>
-                <p className="truncate text-sm text-ink/65">
-                  {item.meaning || item.structure || item.explanation}
-                </p>
+              <div className="flex min-w-0 items-center gap-3">
+                {['vocabulary', 'kanji'].includes(active) && item.image_url ? (
+                  <img
+                    src={item.image_url}
+                    alt={item.word || item.character || 'Item'}
+                    className="h-12 w-12 shrink-0 rounded object-cover ring-1 ring-indigo/10"
+                    style={{ objectPosition: imagePositionFor(item) }}
+                    loading="lazy"
+                  />
+                ) : null}
+                <div className="min-w-0">
+                  <p className="truncate font-semibold text-indigo">
+                    {item.word || item.title || item.character}
+                  </p>
+                  <p className="truncate text-sm text-ink/65">
+                    {item.meaning || item.structure || item.explanation}
+                  </p>
+                </div>
               </div>
               <div className="flex shrink-0 gap-2">
                 <button
@@ -257,6 +373,113 @@ export default function LessonContentManager({
           ))
         )}
       </div>
+
+      {showEditor ? (
+        <div className="fixed inset-0 z-50 overflow-auto bg-washi px-5 py-6 text-indigo sm:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-6 flex items-start justify-between gap-4 border-b border-indigo/10 pb-5">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                  {isEditing ? 'Edit' : 'Add'} {editorTable}
+                </p>
+                <h3 className="mt-1 font-mincho text-3xl text-indigo">
+                  {editorForm.word || editorForm.title || editorForm.character || (isEditing ? 'Selected item' : 'New item')}
+                </h3>
+                <p className="mt-2 text-sm text-ink/65">
+                  The {editorTable} list stays available on the right so you can keep editing without losing context.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => reset(active)}
+                className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
+                aria-label="Close editor"
+              >
+                Back to list
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {message ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
+
+            <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+              <form onSubmit={saveItem} className="zen-glass grid gap-3 p-6">
+                <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+                  <div className="grid gap-3">
+                {renderFields(editorForm)}
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="submit"
+                        disabled={saving}
+                        className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
+                      >
+                        {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                        {isEditing ? 'Save changes' : 'Add item'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => reset(active)}
+                        className="rounded border border-indigo/10 px-4 py-3 text-sm font-semibold text-indigo"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                  {renderImagePreview(editorForm)}
+                </div>
+              </form>
+
+              <aside className="zen-glass p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-vermilion">
+                    {editorTable} list
+                  </p>
+                  <span className="rounded bg-sakura/20 px-2 py-1 text-xs font-semibold text-indigo">
+                    {editorItems.length}
+                  </span>
+                </div>
+                <div className="max-h-[62vh] overflow-auto rounded border border-indigo/10 bg-white/65">
+                  {editorItems.map((item) => {
+                    const selected = editing.id === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => startEdit(editorTable, item)}
+                        className={`flex w-full items-center gap-3 border-b border-indigo/10 p-3 text-left last:border-b-0 ${
+                          selected ? 'bg-sakura/25' : 'hover:bg-washi'
+                        }`}
+                      >
+                        {['vocabulary', 'kanji'].includes(editorTable) && item.image_url ? (
+                          <img
+                            src={item.image_url}
+                            alt={labelForItem(item)}
+                            className="h-10 w-10 shrink-0 rounded object-cover ring-1 ring-indigo/10"
+                            style={{ objectPosition: imagePositionFor(item) }}
+                            loading="lazy"
+                          />
+                        ) : null}
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold text-indigo">
+                            {labelForItem(item)}
+                          </span>
+                          <span className="block truncate text-sm text-ink/65">
+                            {subLabelForItem(item)}
+                          </span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
+}
+
+function imagePositionFor(item) {
+  return `${Number(item?.image_position_x ?? 50)}% ${Number(item?.image_position_y ?? 50)}%`;
 }

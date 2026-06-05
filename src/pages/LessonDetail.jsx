@@ -65,7 +65,7 @@ function EmptySection({ label }) {
   );
 }
 
-function StudyImage({ src, alt, compact = false }) {
+function StudyImage({ src, alt, compact = false, positionX = 50, positionY = 50 }) {
   const shouldUseFallback = isPlaceholderImage(src);
   const label = getPlaceholderLabel(src, alt);
 
@@ -105,6 +105,7 @@ function StudyImage({ src, alt, compact = false }) {
       className={`rounded object-cover ring-1 ring-indigo/5 ${
         compact ? 'h-20 w-20' : 'h-40 w-full'
       }`}
+      style={{ objectPosition: `${Number(positionX ?? 50)}% ${Number(positionY ?? 50)}%` }}
     />
   );
 }
@@ -144,7 +145,7 @@ export default function LessonDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('vocabulary');
-  const [showAdminTools, setShowAdminTools] = useState(false);
+  const [showAdminTools, setShowAdminTools] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -315,7 +316,12 @@ export default function LessonDetail() {
                       const word = pick(item, ['word', 'term', 'japanese', 'vocab'], 'Word');
                       return (
                         <article key={item.id} className="zen-glass zen-hover p-5">
-                          <StudyImage src={item.image_url} alt={word} />
+                          <StudyImage
+                            src={item.image_url}
+                            alt={word}
+                            positionX={item.image_position_x}
+                            positionY={item.image_position_y}
+                          />
                           <div className="mt-4">
                             <p className="font-mincho text-3xl leading-tight">{word}</p>
                             <div className="mt-2 flex flex-wrap gap-2 text-sm">
@@ -406,7 +412,13 @@ export default function LessonDetail() {
                       return (
                         <article key={item.id} className="zen-glass zen-hover p-5">
                           <div className="flex gap-4">
-                            <StudyImage src={item.image_url} alt={character} compact />
+                            <StudyImage
+                              src={item.image_url}
+                              alt={character}
+                              compact
+                              positionX={item.image_position_x}
+                              positionY={item.image_position_y}
+                            />
                             <div className="min-w-0">
                               <p className="font-mincho text-5xl leading-none">
                                 {character}

@@ -23,6 +23,9 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      const metadataRole =
+        currentUser.app_metadata?.role || currentUser.user_metadata?.role;
+
       const { data } = await supabase
         .from('user_profiles')
         .select('role')
@@ -30,7 +33,7 @@ export function AuthProvider({ children }) {
         .maybeSingle();
 
       if (!mounted) return;
-      setRole(data?.role || 'user');
+      setRole(data?.role || metadataRole || 'user');
     }
 
     supabase.auth.getSession().then(({ data }) => {

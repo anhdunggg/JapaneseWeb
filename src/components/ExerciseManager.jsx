@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { LoaderCircle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
@@ -21,6 +21,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
   const [editingId, setEditingId] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const formRef = useRef(null);
 
   function updateField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -33,6 +34,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
 
   function startEdit(exercise) {
     setEditingId(exercise.id);
+    setMessage(`Editing ${exercise.title || 'exercise'}.`);
     setForm({
       type: exercise.type || 'reading',
       title: exercise.title || '',
@@ -42,6 +44,9 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
       questionsText: JSON.stringify(exercise.questions || [], null, 2),
       answerKeyText: JSON.stringify(exercise.answer_key || {}, null, 2),
     });
+    window.setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   }
 
   async function saveExercise(event) {
@@ -107,7 +112,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
 
       {message ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
 
-      <form onSubmit={saveExercise} className="grid gap-3">
+      <form ref={formRef} onSubmit={saveExercise} className="grid gap-3">
         <div className="grid gap-3 md:grid-cols-[160px_1fr]">
           <select className={fieldClass()} value={form.type} onChange={(event) => updateField('type', event.target.value)}>
             <option value="reading">Reading</option>

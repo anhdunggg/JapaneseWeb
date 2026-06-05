@@ -272,7 +272,7 @@ export default function LessonExercises() {
   const [attemptRefreshKey, setAttemptRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showAdminTools, setShowAdminTools] = useState(false);
+  const [showAdminTools, setShowAdminTools] = useState(true);
 
   useEffect(() => {
     if (!user?.id) return;

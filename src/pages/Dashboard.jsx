@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   AlertCircle,
@@ -72,7 +72,8 @@ export default function Dashboard() {
   const [levelFilter, setLevelFilter] = useState("all");
   const [pageSize, setPageSize] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showLessonManager, setShowLessonManager] = useState(false);
+  const [showLessonManager, setShowLessonManager] = useState(true);
+  const lessonManagerRef = useRef(null);
 
   async function loadDashboard() {
     setLoadingLessons(true);
@@ -121,11 +122,18 @@ export default function Dashboard() {
 
   function editLesson(lesson) {
     setEditingLessonId(lesson.id);
+    setShowLessonManager(true);
     setLessonForm({
       title: lesson.title || "",
       description: lesson.description || "",
       jlpt_level: lesson.jlpt_level || "N5",
     });
+    window.setTimeout(() => {
+      lessonManagerRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
   }
 
   async function saveLesson(event) {
@@ -353,7 +361,7 @@ export default function Dashboard() {
               }`}
             >
               <div className="overflow-hidden">
-                <div className="zen-glass p-6">
+                <div ref={lessonManagerRef} className="zen-glass p-6">
                   <div className="mb-5">
                     <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                       Lesson management
@@ -361,6 +369,11 @@ export default function Dashboard() {
                     <h2 className="mt-2 font-mincho text-3xl">
                       {editingLessonId ? "Edit Lesson" : "Create Lesson"}
                     </h2>
+                    {editingLessonId ? (
+                      <p className="mt-2 rounded bg-sakura/20 px-3 py-2 text-sm font-semibold text-indigo">
+                        Editing: {lessonForm.title || "selected lesson"}
+                      </p>
+                    ) : null}
                   </div>
                   <form
                     onSubmit={saveLesson}
