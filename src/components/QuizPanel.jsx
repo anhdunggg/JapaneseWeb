@@ -27,7 +27,7 @@ function normalizeQuestion(question, index) {
   };
 }
 
-export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
+export default function QuizPanel({ lesson, vocabulary, grammar, kanji, onAttemptSaved }) {
   const { user, isAdmin } = useAuth();
   const [questionCount, setQuestionCount] = useState(0);
   const [quiz, setQuiz] = useState(null);
@@ -152,6 +152,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
     }
 
     setMessage('Quiz result saved.');
+    onAttemptSaved?.();
   }
 
   return (
@@ -216,7 +217,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
                 <div className="mb-3 flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
-                      {question.skill} · {question.type.replaceAll('_', ' ')}
+                      {question.skill} - {question.type.replaceAll('_', ' ')}
                     </p>
                     <h3 className="mt-2 font-semibold text-indigo">
                       {index + 1}. {question.prompt}

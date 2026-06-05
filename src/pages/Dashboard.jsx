@@ -13,6 +13,7 @@ import {
   Pencil,
   Plus,
   Search,
+  Settings,
   Sparkles,
   Sprout,
   Trash2,
@@ -71,6 +72,7 @@ export default function Dashboard() {
   const [levelFilter, setLevelFilter] = useState("all");
   const [pageSize, setPageSize] = useState(8);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showLessonManager, setShowLessonManager] = useState(false);
 
   async function loadDashboard() {
     setLoadingLessons(true);
@@ -335,82 +337,101 @@ export default function Dashboard() {
         </section>
 
         {isAdmin ? (
-          <section className="zen-glass mb-8 p-6">
-            <div className="mb-5">
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-                Lesson management
-              </p>
-              <h2 className="mt-2 font-mincho text-3xl">
-                {editingLessonId ? "Edit Lesson" : "Create Lesson"}
-              </h2>
-            </div>
-            <form
-              onSubmit={saveLesson}
-              className="grid gap-4 lg:grid-cols-[1fr_1fr_120px_auto]"
+          <section className="mb-8">
+            <button
+              type="button"
+              onClick={() => setShowLessonManager((current) => !current)}
+              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
             >
-              <input
-                className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
-                value={lessonForm.title}
-                onChange={(event) =>
-                  setLessonForm((current) => ({
-                    ...current,
-                    title: event.target.value,
-                  }))
-                }
-                placeholder="Lesson title"
-                required
-              />
-              <input
-                className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
-                value={lessonForm.description}
-                onChange={(event) =>
-                  setLessonForm((current) => ({
-                    ...current,
-                    description: event.target.value,
-                  }))
-                }
-                placeholder="Short description"
-              />
-              <select
-                className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
-                value={lessonForm.jlpt_level}
-                onChange={(event) =>
-                  setLessonForm((current) => ({
-                    ...current,
-                    jlpt_level: event.target.value,
-                  }))
-                }
-              >
-                {["N5", "N4", "N3", "N2", "N1"].map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={savingLesson}
-                  className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
-                >
-                  {savingLesson ? (
-                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  {editingLessonId ? "Save" : "Create"}
-                </button>
-                {editingLessonId ? (
-                  <button
-                    type="button"
-                    onClick={resetLessonForm}
-                    className="rounded border border-indigo/10 px-4 py-3 text-sm font-semibold text-indigo"
+              <Settings className="h-4 w-4 text-vermilion" />
+              {showLessonManager ? "Hide lesson manager" : "Lesson manager"}
+            </button>
+
+            <div
+              className={`grid transition-all duration-300 ${
+                showLessonManager ? "mt-4 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+              }`}
+            >
+              <div className="overflow-hidden">
+                <div className="zen-glass p-6">
+                  <div className="mb-5">
+                    <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                      Lesson management
+                    </p>
+                    <h2 className="mt-2 font-mincho text-3xl">
+                      {editingLessonId ? "Edit Lesson" : "Create Lesson"}
+                    </h2>
+                  </div>
+                  <form
+                    onSubmit={saveLesson}
+                    className="grid gap-4 lg:grid-cols-[1fr_1fr_120px_auto]"
                   >
-                    Cancel
-                  </button>
-                ) : null}
+                    <input
+                      className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+                      value={lessonForm.title}
+                      onChange={(event) =>
+                        setLessonForm((current) => ({
+                          ...current,
+                          title: event.target.value,
+                        }))
+                      }
+                      placeholder="Lesson title"
+                      required
+                    />
+                    <input
+                      className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+                      value={lessonForm.description}
+                      onChange={(event) =>
+                        setLessonForm((current) => ({
+                          ...current,
+                          description: event.target.value,
+                        }))
+                      }
+                      placeholder="Short description"
+                    />
+                    <select
+                      className="rounded border border-indigo/10 bg-washi px-4 py-3 text-sm text-indigo focus:outline-none"
+                      value={lessonForm.jlpt_level}
+                      onChange={(event) =>
+                        setLessonForm((current) => ({
+                          ...current,
+                          jlpt_level: event.target.value,
+                        }))
+                      }
+                    >
+                      {["N5", "N4", "N3", "N2", "N1"].map((level) => (
+                        <option key={level} value={level}>
+                          {level}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        disabled={savingLesson}
+                        className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft disabled:opacity-60"
+                      >
+                        {savingLesson ? (
+                          <LoaderCircle className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        {editingLessonId ? "Save" : "Create"}
+                      </button>
+                      {editingLessonId ? (
+                        <button
+                          type="button"
+                          onClick={resetLessonForm}
+                          className="rounded border border-indigo/10 px-4 py-3 text-sm font-semibold text-indigo"
+                        >
+                          Cancel
+                        </button>
+                      ) : null}
+                    </div>
+                  </form>
+                </div>
               </div>
-            </form>
+            </div>
           </section>
         ) : null}
 

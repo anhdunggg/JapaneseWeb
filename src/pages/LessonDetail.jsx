@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BookOpenText,
   Brain,
+  ChevronDown,
   ImageOff,
   Languages,
   LoaderCircle,
@@ -142,6 +143,8 @@ export default function LessonDetail() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('vocabulary');
+  const [showAdminTools, setShowAdminTools] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -243,161 +246,202 @@ export default function LessonDetail() {
             </section>
 
             {isAdmin ? (
-              <LessonContentManager
-                lessonId={lessonId}
-                vocabulary={vocabulary}
-                grammar={grammar}
-                kanji={kanji}
-                onChange={() => setRefreshKey((current) => current + 1)}
-              />
+              <section className="mb-8">
+                <button
+                  type="button"
+                  onClick={() => setShowAdminTools((current) => !current)}
+                  className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/80 px-4 py-3 text-sm font-semibold text-indigo shadow-soft"
+                >
+                  Admin tools
+                  <ChevronDown
+                    className={`h-4 w-4 transition ${
+                      showAdminTools ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {showAdminTools ? (
+                  <div className="mt-4">
+                    <LessonContentManager
+                      lessonId={lessonId}
+                      vocabulary={vocabulary}
+                      grammar={grammar}
+                      kanji={kanji}
+                      onChange={() => setRefreshKey((current) => current + 1)}
+                    />
+                  </div>
+                ) : null}
+              </section>
             ) : null}
 
-            <section className="mb-8">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="flex items-center gap-2 font-mincho text-3xl">
-                  <Languages className="h-6 w-6 text-vermilion" />
-                  Vocabulary
-                </h2>
-                <span className="text-sm font-semibold text-ink/60">
-                  {vocabulary.length} items
-                </span>
-              </div>
-              {vocabulary.length === 0 ? <EmptySection label="vocabulary" /> : null}
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {vocabulary.map((item) => {
-                  const word = pick(item, ['word', 'term', 'japanese', 'vocab'], 'Word');
-                  return (
-                    <article
-                      key={item.id}
-                      className="zen-glass zen-hover p-5"
-                    >
-                      <StudyImage src={item.image_url} alt={word} />
-                      <div className="mt-4">
-                        <p className="font-mincho text-3xl leading-tight">{word}</p>
-                        <div className="mt-2 flex flex-wrap gap-2 text-sm">
-                          {item.furigana ? (
-                            <span className="rounded bg-sakura/25 px-2 py-1 text-indigo">
-                              {item.furigana}
-                            </span>
-                          ) : null}
-                          {item.romaji ? (
-                            <span className="rounded bg-mist px-2 py-1 text-ink/75">
-                              {item.romaji}
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-3 font-semibold text-vermilion">
-                          {pick(item, ['meaning', 'english', 'vietnamese', 'definition'])}
-                        </p>
-                        {item.details ? (
-                          <p className="mt-3 text-sm leading-6 text-ink/75">
-                            {item.details}
-                          </p>
-                        ) : null}
-                        <ExamplesList examples={item.examples} />
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="mb-8">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="flex items-center gap-2 font-mincho text-3xl">
-                  <Brain className="h-6 w-6 text-vermilion" />
-                  Grammar
-                </h2>
-                <span className="text-sm font-semibold text-ink/60">
-                  {grammar.length} points
-                </span>
-              </div>
-              {grammar.length === 0 ? <EmptySection label="grammar" /> : null}
-              <div className="space-y-5">
-                {grammar.map((item) => (
-                  <article
-                    key={item.id}
-                    className="zen-glass zen-hover p-6"
+            <section>
+              <div className="mb-6 flex flex-wrap gap-2">
+                {[
+                  { id: 'vocabulary', label: 'Vocabulary', count: vocabulary.length },
+                  { id: 'grammar', label: 'Grammar', count: grammar.length },
+                  { id: 'kanji', label: 'Kanji', count: kanji.length },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`rounded px-4 py-3 text-sm font-semibold transition ${
+                      activeTab === tab.id
+                        ? 'bg-indigo text-washi shadow-soft'
+                        : 'bg-white/75 text-indigo ring-1 ring-indigo/10 hover:ring-sakura'
+                    }`}
                   >
-                    <h3 className="font-mincho text-2xl">
-                      {pick(item, ['title', 'pattern', 'name'], 'Grammar point')}
-                    </h3>
-                    {item.structure ? (
-                      <p className="mt-3 rounded bg-mist px-4 py-3 font-semibold text-indigo">
-                        {item.structure}
-                      </p>
-                    ) : null}
-                    <p className="mt-4 whitespace-pre-line text-sm leading-7 text-ink/75">
-                      {pick(item, ['explanation', 'meaning', 'description', 'usage'])}
-                    </p>
-                    {item.example_japanese || item.example_vietnamese ? (
-                      <div className="mt-4 rounded border border-sakura/40 bg-sakura/10 p-4">
-                        <p className="font-mincho text-xl">{item.example_japanese}</p>
-                        <p className="mt-1 text-sm text-ink/75">
-                          {item.example_vietnamese}
-                        </p>
-                      </div>
-                    ) : null}
-                    <ExamplesList examples={item.examples} />
-                  </article>
+                    {tab.label}
+                    <span className="ml-2 rounded bg-sakura/25 px-2 py-0.5 text-xs">
+                      {tab.count}
+                    </span>
+                  </button>
                 ))}
               </div>
-            </section>
 
-            <section>
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="flex items-center gap-2 font-mincho text-3xl">
-                  <BookOpenText className="h-6 w-6 text-vermilion" />
-                  Kanji
-                </h2>
-                <span className="text-sm font-semibold text-ink/60">
-                  {kanji.length} characters
-                </span>
-              </div>
-              {kanji.length === 0 ? <EmptySection label="kanji" /> : null}
-              <div className="grid gap-5 md:grid-cols-2">
-                {kanji.map((item) => {
-                  const character = pick(item, ['character', 'kanji', 'symbol'], 'Kanji');
-                  return (
-                    <article
-                      key={item.id}
-                      className="zen-glass zen-hover p-5"
-                    >
-                      <div className="flex gap-4">
-                        <StudyImage src={item.image_url} alt={character} compact />
-                        <div className="min-w-0">
-                          <p className="font-mincho text-5xl leading-none">
-                            {character}
-                          </p>
-                          <p className="mt-2 font-semibold text-vermilion">
-                            {item.meaning}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                        {item.onyomi ? (
-                          <p className="rounded bg-mist p-3 text-sm">
-                            <span className="font-semibold text-indigo">Onyomi: </span>
-                            {item.onyomi}
+              {activeTab === 'vocabulary' ? (
+                <div className="mb-8">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <h2 className="flex items-center gap-2 font-mincho text-3xl">
+                      <Languages className="h-6 w-6 text-vermilion" />
+                      Vocabulary
+                    </h2>
+                    <span className="text-sm font-semibold text-ink/60">
+                      {vocabulary.length} items
+                    </span>
+                  </div>
+                  {vocabulary.length === 0 ? <EmptySection label="vocabulary" /> : null}
+                  <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                    {vocabulary.map((item) => {
+                      const word = pick(item, ['word', 'term', 'japanese', 'vocab'], 'Word');
+                      return (
+                        <article key={item.id} className="zen-glass zen-hover p-5">
+                          <StudyImage src={item.image_url} alt={word} />
+                          <div className="mt-4">
+                            <p className="font-mincho text-3xl leading-tight">{word}</p>
+                            <div className="mt-2 flex flex-wrap gap-2 text-sm">
+                              {item.furigana ? (
+                                <span className="rounded bg-sakura/25 px-2 py-1 text-indigo">
+                                  {item.furigana}
+                                </span>
+                              ) : null}
+                              {item.romaji ? (
+                                <span className="rounded bg-mist px-2 py-1 text-ink/75">
+                                  {item.romaji}
+                                </span>
+                              ) : null}
+                            </div>
+                            <p className="mt-3 font-semibold text-vermilion">
+                              {pick(item, ['meaning', 'english', 'vietnamese', 'definition'])}
+                            </p>
+                            {item.details ? (
+                              <p className="mt-3 text-sm leading-6 text-ink/75">
+                                {item.details}
+                              </p>
+                            ) : null}
+                            <ExamplesList examples={item.examples} />
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'grammar' ? (
+                <div className="mb-8">
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <h2 className="flex items-center gap-2 font-mincho text-3xl">
+                      <Brain className="h-6 w-6 text-vermilion" />
+                      Grammar
+                    </h2>
+                    <span className="text-sm font-semibold text-ink/60">
+                      {grammar.length} points
+                    </span>
+                  </div>
+                  {grammar.length === 0 ? <EmptySection label="grammar" /> : null}
+                  <div className="space-y-5">
+                    {grammar.map((item) => (
+                      <article key={item.id} className="zen-glass zen-hover p-6">
+                        <h3 className="font-mincho text-2xl">
+                          {pick(item, ['title', 'pattern', 'name'], 'Grammar point')}
+                        </h3>
+                        {item.structure ? (
+                          <p className="mt-3 rounded bg-mist px-4 py-3 font-semibold text-indigo">
+                            {item.structure}
                           </p>
                         ) : null}
-                        {item.kunyomi ? (
-                          <p className="rounded bg-mist p-3 text-sm">
-                            <span className="font-semibold text-indigo">Kunyomi: </span>
-                            {item.kunyomi}
-                          </p>
-                        ) : null}
-                      </div>
-                      {item.mnemonic ? (
-                        <p className="mt-4 text-sm leading-6 text-ink/75">
-                          {item.mnemonic}
+                        <p className="mt-4 whitespace-pre-line text-sm leading-7 text-ink/75">
+                          {pick(item, ['explanation', 'meaning', 'description', 'usage'])}
                         </p>
-                      ) : null}
-                      <ExamplesList examples={item.examples} mode="kanji" />
-                    </article>
-                  );
-                })}
-              </div>
+                        {item.example_japanese || item.example_vietnamese ? (
+                          <div className="mt-4 rounded border border-sakura/40 bg-sakura/10 p-4">
+                            <p className="font-mincho text-xl">{item.example_japanese}</p>
+                            <p className="mt-1 text-sm text-ink/75">
+                              {item.example_vietnamese}
+                            </p>
+                          </div>
+                        ) : null}
+                        <ExamplesList examples={item.examples} />
+                      </article>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {activeTab === 'kanji' ? (
+                <div>
+                  <div className="mb-4 flex items-center justify-between gap-4">
+                    <h2 className="flex items-center gap-2 font-mincho text-3xl">
+                      <BookOpenText className="h-6 w-6 text-vermilion" />
+                      Kanji
+                    </h2>
+                    <span className="text-sm font-semibold text-ink/60">
+                      {kanji.length} characters
+                    </span>
+                  </div>
+                  {kanji.length === 0 ? <EmptySection label="kanji" /> : null}
+                  <div className="grid gap-5 md:grid-cols-2">
+                    {kanji.map((item) => {
+                      const character = pick(item, ['character', 'kanji', 'symbol'], 'Kanji');
+                      return (
+                        <article key={item.id} className="zen-glass zen-hover p-5">
+                          <div className="flex gap-4">
+                            <StudyImage src={item.image_url} alt={character} compact />
+                            <div className="min-w-0">
+                              <p className="font-mincho text-5xl leading-none">
+                                {character}
+                              </p>
+                              <p className="mt-2 font-semibold text-vermilion">
+                                {item.meaning}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                            {item.onyomi ? (
+                              <p className="rounded bg-mist p-3 text-sm">
+                                <span className="font-semibold text-indigo">Onyomi: </span>
+                                {item.onyomi}
+                              </p>
+                            ) : null}
+                            {item.kunyomi ? (
+                              <p className="rounded bg-mist p-3 text-sm">
+                                <span className="font-semibold text-indigo">Kunyomi: </span>
+                                {item.kunyomi}
+                              </p>
+                            ) : null}
+                          </div>
+                          {item.mnemonic ? (
+                            <p className="mt-4 text-sm leading-6 text-ink/75">
+                              {item.mnemonic}
+                            </p>
+                          ) : null}
+                          <ExamplesList examples={item.examples} mode="kanji" />
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
             </section>
           </>
         )}
