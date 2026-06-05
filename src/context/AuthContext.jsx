@@ -6,6 +6,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -16,11 +17,29 @@ export function AuthProvider({ children }) {
 
     let mounted = true;
 
+    async function loadRole(currentUser) {
+      if (!currentUser) {
+        setRole('user');
+        return;
+      }
+
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('role')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      if (!mounted) return;
+      setRole(data?.role || 'user');
+    }
+
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       setSession(data.session);
       setUser(data.session?.user ?? null);
-      setLoading(false);
+      loadRole(data.session?.user ?? null).finally(() => {
+        if (mounted) setLoading(false);
+      });
     });
 
     const {
@@ -28,7 +47,9 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
-      setLoading(false);
+      loadRole(currentSession?.user ?? null).finally(() => {
+        if (mounted) setLoading(false);
+      });
     });
 
     return () => {
@@ -41,6 +62,8 @@ export function AuthProvider({ children }) {
     () => ({
       session,
       user,
+      role,
+      isAdmin: role === 'admin',
       supabaseConfigError,
       loading,
       signUp: (email, password) => supabase.auth.signUp({ email, password }),
@@ -48,7 +71,7 @@ export function AuthProvider({ children }) {
         supabase.auth.signInWithPassword({ email, password }),
       signOut: () => supabase.auth.signOut(),
     }),
-    [loading, session, user],
+    [loading, role, session, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

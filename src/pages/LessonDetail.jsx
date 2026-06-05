@@ -13,6 +13,7 @@ import {
 import { supabase } from '../supabaseClient';
 import LessonContentManager from '../components/LessonContentManager';
 import QuizPanel from '../components/QuizPanel';
+import { useAuth } from '../context/AuthContext';
 import { getPlaceholderLabel, isPlaceholderImage } from '../lib/imageUtils';
 
 function pick(item, keys, fallback = '') {
@@ -133,6 +134,7 @@ function ExamplesList({ examples, mode = 'sentence' }) {
 
 export default function LessonDetail() {
   const { lessonId } = useParams();
+  const { isAdmin } = useAuth();
   const [lesson, setLesson] = useState(null);
   const [vocabulary, setVocabulary] = useState([]);
   const [grammar, setGrammar] = useState([]);
@@ -231,13 +233,15 @@ export default function LessonDetail() {
               </div>
             </section>
 
-            <LessonContentManager
-              lessonId={lessonId}
-              vocabulary={vocabulary}
-              grammar={grammar}
-              kanji={kanji}
-              onChange={() => setRefreshKey((current) => current + 1)}
-            />
+            {isAdmin ? (
+              <LessonContentManager
+                lessonId={lessonId}
+                vocabulary={vocabulary}
+                grammar={grammar}
+                kanji={kanji}
+                onChange={() => setRefreshKey((current) => current + 1)}
+              />
+            ) : null}
 
             <QuizPanel
               lesson={lesson}

@@ -46,7 +46,7 @@ ${grammarText || '- none'}
 Kanji:
 ${kanjiText || '- none'}
 
-Create 8 questions. Mix multiple-choice, fill-in-the-blank, translation, and grammar-choice questions when possible.
+Create 30 questions. Mix multiple-choice, fill-in-the-blank, translation, and grammar-choice questions when possible.
 Each multiple-choice question must have 4 choices.
 Each answer must be concise and exactly match one choice when choices are provided.`;
 }
@@ -122,4 +122,9 @@ export async function generateLessonQuiz({ lesson, vocabulary, grammar, kanji })
       choices: Array.isArray(question.choices) ? question.choices : [],
     })),
   };
+}
+
+export async function generateQuestionBank(params) {
+  const quiz = await generateLessonQuiz(params);
+  return quiz.questions;
 }

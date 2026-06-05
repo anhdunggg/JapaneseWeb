@@ -3,6 +3,28 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { BookOpenText, LoaderCircle, LockKeyhole, Mail, Torus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+function getAuthMessage(error) {
+  if (!error) return '';
+
+  if (error.message === 'Invalid login credentials') {
+    return 'The email or password you entered is incorrect.';
+  }
+
+  if (error.message.includes('Email not confirmed')) {
+    return 'Please confirm your email address before signing in.';
+  }
+
+  if (error.message.includes('User already registered')) {
+    return 'An account with this email already exists. Please sign in instead.';
+  }
+
+  if (error.message.includes('Password should be at least')) {
+    return 'Your password is too short. Please use at least 6 characters.';
+  }
+
+  return error.message;
+}
+
 export default function AuthPage() {
   const { signIn, signUp, user } = useAuth();
   const { supabaseConfigError } = useAuth();
@@ -34,12 +56,19 @@ export default function AuthPage() {
     setSubmitting(true);
 
     const authAction = isRegistering ? signUp : signIn;
-    const { error } = await authAction(email, password);
+    const { data, error } = await authAction(email, password);
 
     setSubmitting(false);
 
     if (error) {
-      setMessage(error.message);
+      setMessage(getAuthMessage(error));
+      return;
+    }
+
+    if (isRegistering && !data.session) {
+      setMessage('Account created. Please check your email and confirm your address before signing in.');
+      setMode('login');
+      setPassword('');
       return;
     }
 

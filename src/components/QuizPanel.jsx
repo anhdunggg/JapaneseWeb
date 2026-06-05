@@ -1,16 +1,40 @@
-import { useMemo, useState } from 'react';
-import { Bot, CheckCircle2, LoaderCircle, Save, Sparkles } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Bot, CheckCircle2, DatabaseZap, LoaderCircle, Save, Shuffle, Sparkles } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-import { generateLessonQuiz } from '../lib/geminiQuiz';
+import { useAuth } from '../context/AuthContext';
+import { generateQuestionBank } from '../lib/geminiQuiz';
+
+const QUIZ_SIZE = 8;
 
 function normalizeAnswer(value) {
   return String(value ?? '').trim().toLowerCase();
 }
 
+function shuffle(items) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function normalizeQuestion(question, index) {
+  return {
+    id: question.id || `${Date.now()}-${index}`,
+    type: question.type || 'multiple_choice',
+    skill: question.skill || 'mixed',
+    prompt: question.prompt || '',
+    choices: Array.isArray(question.choices) ? question.choices : [],
+    answer: question.answer || '',
+    explanation: question.explanation || '',
+    source: question.source || '',
+  };
+}
+
 export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
+  const { user, isAdmin } = useAuth();
+  const [questionCount, setQuestionCount] = useState(0);
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({});
-  const [generating, setGenerating] = useState(false);
+  const [loadingBank, setLoadingBank] = useState(true);
+  const [generatingBank, setGeneratingBank] = useState(false);
+  const [creatingQuiz, setCreatingQuiz] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [showResult, setShowResult] = useState(false);
@@ -22,20 +46,87 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
     }, 0);
   }, [answers, quiz]);
 
-  async function handleGenerate() {
-    setGenerating(true);
+  async function loadQuestionCount() {
+    setLoadingBank(true);
+    const { count, error } = await supabase
+      .from('question_bank')
+      .select('id', { count: 'exact', head: true })
+      .eq('lesson_id', lesson.id);
+
+    if (error) {
+      setMessage(`Could not load question bank: ${error.message}`);
+      setLoadingBank(false);
+      return;
+    }
+
+    setQuestionCount(count ?? 0);
+    setLoadingBank(false);
+  }
+
+  useEffect(() => {
+    if (lesson?.id) loadQuestionCount();
+  }, [lesson?.id]);
+
+  async function handleGenerateBank() {
+    setGeneratingBank(true);
+    setMessage('');
+
+    try {
+      const questions = await generateQuestionBank({ lesson, vocabulary, grammar, kanji });
+      const rows = questions.map((question) => ({
+        lesson_id: lesson.id,
+        type: question.type,
+        skill: question.skill,
+        prompt: question.prompt,
+        choices: question.choices,
+        answer: question.answer,
+        explanation: question.explanation,
+        source: question.source,
+        difficulty: 'normal',
+        created_by_ai: true,
+      }));
+
+      const { error } = await supabase.from('question_bank').insert(rows);
+      if (error) throw error;
+
+      setMessage(`Added ${rows.length} questions to this lesson bank.`);
+      await loadQuestionCount();
+    } catch (err) {
+      setMessage(err.message);
+    } finally {
+      setGeneratingBank(false);
+    }
+  }
+
+  async function handleCreateQuiz() {
+    setCreatingQuiz(true);
     setMessage('');
     setShowResult(false);
     setAnswers({});
 
-    try {
-      const nextQuiz = await generateLessonQuiz({ lesson, vocabulary, grammar, kanji });
-      setQuiz(nextQuiz);
-    } catch (err) {
-      setMessage(err.message);
-    } finally {
-      setGenerating(false);
+    const { data, error } = await supabase
+      .from('question_bank')
+      .select('*')
+      .eq('lesson_id', lesson.id);
+
+    setCreatingQuiz(false);
+
+    if (error) {
+      setMessage(`Could not create quiz: ${error.message}`);
+      return;
     }
+
+    const bank = data ?? [];
+    if (bank.length === 0) {
+      setMessage('No questions are available yet. Ask an admin to generate the question bank first.');
+      return;
+    }
+
+    const selected = shuffle(bank).slice(0, Math.min(QUIZ_SIZE, bank.length));
+    setQuiz({
+      title: `${lesson.title || 'Lesson'} Practice`,
+      questions: selected.map(normalizeQuestion),
+    });
   }
 
   async function handleSave() {
@@ -44,10 +135,13 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
     setSaving(true);
     setMessage('');
 
-    const { error } = await supabase.from('quiz_history').insert({
+    const { error } = await supabase.from('quiz_attempts').insert({
+      user_id: user.id,
       lesson_id: lesson.id,
       score,
       total_questions: quiz.questions.length,
+      questions: quiz.questions,
+      answers,
     });
 
     setSaving(false);
@@ -66,22 +160,38 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
         <div>
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <Bot className="h-4 w-4" />
-            Gemini practice
+            Practice quiz
           </p>
-          <h2 className="font-mincho text-3xl">AI Quiz Generator</h2>
+          <h2 className="font-mincho text-3xl">Question Bank Quiz</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/70">
-            Generates practice strictly from this lesson&apos;s vocabulary, grammar, and kanji.
+            Users get a fresh random quiz from saved lesson questions. Gemini is only used by admins to expand the bank.
+          </p>
+          <p className="mt-2 text-sm font-semibold text-indigo">
+            {loadingBank ? 'Loading bank...' : `${questionCount} saved questions`}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={generating}
-          className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95 disabled:opacity-70"
-        >
-          {generating ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-          Generate quiz
-        </button>
+        <div className="flex flex-col gap-2 sm:items-end">
+          {isAdmin ? (
+            <button
+              type="button"
+              onClick={handleGenerateBank}
+              disabled={generatingBank}
+              className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura disabled:opacity-70"
+            >
+              {generatingBank ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <DatabaseZap className="h-4 w-4" />}
+              Generate bank with AI
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={handleCreateQuiz}
+            disabled={creatingQuiz || loadingBank}
+            className="inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95 disabled:opacity-70"
+          >
+            {creatingQuiz ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Shuffle className="h-4 w-4" />}
+            Create random quiz
+          </button>
+        </div>
       </div>
 
       {message ? <p className="mb-5 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
@@ -91,7 +201,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
           <div className="flex flex-col gap-3 rounded bg-washi p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-mincho text-2xl">{quiz.title}</p>
-              <p className="mt-1 text-sm text-ink/70">{quiz.questions.length} questions</p>
+              <p className="mt-1 text-sm text-ink/70">{quiz.questions.length} random questions</p>
             </div>
             {showResult ? (
               <p className="rounded bg-sakura/30 px-4 py-2 text-sm font-semibold text-indigo">
@@ -174,7 +284,7 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji }) {
               className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
             >
               {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save result
+              Save attempt
             </button>
           </div>
         </div>

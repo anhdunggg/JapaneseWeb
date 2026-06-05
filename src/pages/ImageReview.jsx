@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 import { AlertCircle, ArrowLeft, ImageOff, LoaderCircle, RefreshCw, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import { isPlaceholderImage } from '../lib/imageUtils';
 
 export default function ImageReview() {
+  const { isAdmin } = useAuth();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState('');
@@ -30,8 +32,10 @@ export default function ImageReview() {
   }
 
   useEffect(() => {
-    loadItems();
-  }, []);
+    if (isAdmin) {
+      loadItems();
+    }
+  }, [isAdmin]);
 
   async function updateImage(item, imageUrl) {
     setSavingId(item.id);
@@ -61,6 +65,17 @@ export default function ImageReview() {
           Back to dashboard
         </Link>
 
+        {!isAdmin ? (
+          <section className="rounded bg-white/90 p-7 shadow-zen ring-1 ring-indigo/5">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+              Admin only
+            </p>
+            <h1 className="mt-2 font-mincho text-3xl">Image review is restricted.</h1>
+          </section>
+        ) : null}
+
+        {isAdmin ? (
+        <>
         <section className="mb-6 rounded bg-white/90 p-7 shadow-zen ring-1 ring-indigo/5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -140,6 +155,8 @@ export default function ImageReview() {
             ))}
           </div>
         )}
+        </>
+        ) : null}
       </div>
     </main>
   );
