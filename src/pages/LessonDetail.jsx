@@ -151,7 +151,12 @@ export default function LessonDetail() {
     let mounted = true;
 
     async function loadLesson() {
-      setLoading(true);
+      const shouldShowFullLoading =
+        !lesson || String(lesson.id) !== String(lessonId);
+
+      if (shouldShowFullLoading) {
+        setLoading(true);
+      }
       setError('');
 
       const [lessonResult, vocabularyResult, grammarResult, kanjiResult] =
