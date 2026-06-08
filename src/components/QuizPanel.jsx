@@ -27,7 +27,14 @@ function normalizeQuestion(question, index) {
   };
 }
 
-export default function QuizPanel({ lesson, vocabulary, grammar, kanji, onAttemptSaved }) {
+export default function QuizPanel({
+  lesson,
+  vocabulary,
+  grammar,
+  kanji,
+  saveHistory = true,
+  onAttemptSaved,
+}) {
   const { user, isAdmin } = useAuth();
   const [questionCount, setQuestionCount] = useState(0);
   const [quiz, setQuiz] = useState(null);
@@ -131,6 +138,10 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji, onAttemp
 
   async function handleSave() {
     if (!quiz) return;
+    if (!saveHistory) {
+      setMessage('Admin preview mode: quiz history is not saved.');
+      return;
+    }
 
     setSaving(true);
     setMessage('');
@@ -277,15 +288,21 @@ export default function QuizPanel({ lesson, vocabulary, grammar, kanji, onAttemp
             >
               Check answers
             </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={!showResult || saving}
-              className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
-            >
-              {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              Save attempt
-            </button>
+            {saveHistory ? (
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={!showResult || saving}
+                className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
+              >
+                {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                Save attempt
+              </button>
+            ) : showResult ? (
+              <p className="rounded bg-washi px-4 py-3 text-sm font-semibold text-ink/70">
+                Admin preview: history is not saved.
+              </p>
+            ) : null}
           </div>
         </div>
       ) : null}

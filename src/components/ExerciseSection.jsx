@@ -37,7 +37,7 @@ function iconForType(type) {
   return PenLine;
 }
 
-export default function ExerciseSection({ exercises, onAttemptSaved }) {
+export default function ExerciseSection({ exercises, saveHistory = true, onAttemptSaved }) {
   const { user } = useAuth();
   const [answers, setAnswers] = useState({});
   const [checkedExerciseId, setCheckedExerciseId] = useState('');
@@ -96,6 +96,11 @@ export default function ExerciseSection({ exercises, onAttemptSaved }) {
   }
 
   async function saveAttempt(exercise) {
+    if (!saveHistory) {
+      setMessage('Admin preview mode: exercise history is not saved.');
+      return;
+    }
+
     const questions = parseQuestions(exercise.questions);
     const attemptAnswers = Object.fromEntries(
       questions.map((question, index) => {
@@ -329,15 +334,21 @@ export default function ExerciseSection({ exercises, onAttemptSaved }) {
                     >
                       Check exercise
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => saveAttempt(exercise)}
-                      disabled={savingId === exercise.id || checkedExerciseId !== exercise.id}
-                      className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
-                    >
-                      {savingId === exercise.id ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                      Save attempt
-                    </button>
+                    {saveHistory ? (
+                      <button
+                        type="button"
+                        onClick={() => saveAttempt(exercise)}
+                        disabled={savingId === exercise.id || checkedExerciseId !== exercise.id}
+                        className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
+                      >
+                        {savingId === exercise.id ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        Save attempt
+                      </button>
+                    ) : checked ? (
+                      <p className="rounded bg-washi px-4 py-3 text-sm font-semibold text-ink/70">
+                        Admin preview: history is not saved.
+                      </p>
+                    ) : null}
                     {checked ? (
                       <p className="text-sm font-semibold text-indigo">
                         Score: {scoreFor(exercise)}/{questions.length}

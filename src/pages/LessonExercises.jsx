@@ -289,8 +289,6 @@ export default function LessonExercises() {
         grammarResult,
         kanjiResult,
         exercisesResult,
-        quizAttemptsResult,
-        exerciseAttemptsResult,
       ] = await Promise.all([
         supabase.from('lessons').select('*').eq('id', lessonId).single(),
         supabase.from('vocabulary').select('*').eq('lesson_id', lessonId),
@@ -301,19 +299,24 @@ export default function LessonExercises() {
           .select('*')
           .eq('lesson_id', lessonId)
           .order('created_at', { ascending: false }),
-        supabase
-          .from('quiz_attempts')
-          .select('*')
-          .eq('lesson_id', lessonId)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('exercise_attempts')
-          .select('*')
-          .eq('lesson_id', lessonId)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false }),
       ]);
+
+      const [quizAttemptsResult, exerciseAttemptsResult] = isAdmin
+        ? [{ data: [], error: null }, { data: [], error: null }]
+        : await Promise.all([
+            supabase
+              .from('quiz_attempts')
+              .select('*')
+              .eq('lesson_id', lessonId)
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false }),
+            supabase
+              .from('exercise_attempts')
+              .select('*')
+              .eq('lesson_id', lessonId)
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false }),
+          ]);
 
       if (!mounted) return;
 
@@ -347,7 +350,7 @@ export default function LessonExercises() {
     return () => {
       mounted = false;
     };
-  }, [lessonId, refreshKey, attemptRefreshKey, user?.id]);
+  }, [isAdmin, lessonId, refreshKey, attemptRefreshKey, user?.id]);
 
   if (loading) {
     return (
@@ -437,22 +440,26 @@ export default function LessonExercises() {
               </section>
             ) : null}
 
-            <ProgressPanel
-              quizAttempts={quizAttempts}
-              exerciseAttempts={exerciseAttempts}
-              exercises={exercises}
-            />
+            {!isAdmin ? (
+              <ProgressPanel
+                quizAttempts={quizAttempts}
+                exerciseAttempts={exerciseAttempts}
+                exercises={exercises}
+              />
+            ) : null}
 
             <QuizPanel
               lesson={lesson}
               vocabulary={vocabulary}
               grammar={grammar}
               kanji={kanji}
+              saveHistory={!isAdmin}
               onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
             />
 
             <ExerciseSection
               exercises={exercises}
+              saveHistory={!isAdmin}
               onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
             />
           </>
