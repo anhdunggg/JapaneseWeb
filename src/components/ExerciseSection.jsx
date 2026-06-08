@@ -128,6 +128,16 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
       return;
     }
 
+    await supabase.from('user_lesson_progress').upsert({
+      user_id: user.id,
+      lesson_id: exercise.lesson_id,
+      status: scoreFor(exercise) === questions.length ? 'completed' : 'review',
+      last_score: scoreFor(exercise),
+      last_total: questions.length,
+      last_activity_at: new Date().toISOString(),
+      completed_at: scoreFor(exercise) === questions.length ? new Date().toISOString() : null,
+    });
+
     setMessage('Exercise attempt saved.');
     onAttemptSaved?.();
   }

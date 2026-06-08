@@ -128,4 +128,32 @@ a:focus-visible {
   .zen-float {
     animation: float-soft 8s ease-in-out infinite;
   }
+
+  .quest-hero {
+    background:
+      radial-gradient(circle at 82% 18%, rgba(255, 183, 197, 0.22), transparent 16rem),
+      radial-gradient(circle at 14% 90%, rgba(230, 126, 34, 0.2), transparent 16rem),
+      linear-gradient(135deg, #243447, #2c3e50 52%, #1f2f3f);
+  }
+
+  .quest-map {
+    position: relative;
+  }
+
+  .quest-map::before {
+    position: absolute;
+    inset: 1.25rem auto 1.25rem 2.25rem;
+    width: 2px;
+    content: "";
+    background: linear-gradient(to bottom, rgba(230, 126, 34, 0.35), rgba(255, 183, 197, 0.2));
+  }
+
+  .quest-node {
+    min-height: 220px;
+  }
+
+  .quiz-focus-card {
+    min-height: 330px;
+  }
+
 }

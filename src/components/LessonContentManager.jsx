@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
 import { LoaderCircle, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '../supabaseClient';
 
 const emptyForms = {
@@ -150,9 +152,11 @@ export default function LessonContentManager({
 
     if (result.error) {
       setMessage(result.error.message);
+      toast.error(result.error.message);
       return;
     }
 
+    toast.success(isEditing ? 'Đã lưu thay đổi.' : 'Đã thêm nội dung.');
     reset(editorTable);
     onChange();
   }
@@ -166,9 +170,11 @@ export default function LessonContentManager({
 
     if (error) {
       setMessage(error.message);
+      toast.error(error.message);
       return;
     }
 
+    toast.success('Đã xóa nội dung.');
     onChange();
   }
 
@@ -374,30 +380,39 @@ export default function LessonContentManager({
         )}
       </div>
 
-      {showEditor ? (
-        <div className="fixed inset-0 z-50 overflow-auto bg-washi px-5 py-6 text-indigo sm:px-8">
-          <div className="mx-auto max-w-7xl">
+      <Dialog.Root
+        open={showEditor}
+        onOpenChange={(open) => {
+          if (open) {
+            setShowEditor(true);
+            return;
+          }
+          reset(active);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-indigo/20 backdrop-blur-sm" />
+          <Dialog.Content className="fixed inset-0 z-50 overflow-auto bg-washi px-5 py-6 text-indigo sm:px-8">
+            <div className="mx-auto max-w-7xl">
             <div className="mb-6 flex items-start justify-between gap-4 border-b border-indigo/10 pb-5">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                   {isEditing ? 'Edit' : 'Add'} {editorTable}
                 </p>
-                <h3 className="mt-1 font-mincho text-3xl text-indigo">
+                <Dialog.Title className="mt-1 font-mincho text-3xl text-indigo">
                   {editorForm.word || editorForm.title || editorForm.character || (isEditing ? 'Selected item' : 'New item')}
-                </h3>
-                <p className="mt-2 text-sm text-ink/65">
+                </Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm text-ink/65">
                   The {editorTable} list stays available on the right so you can keep editing without losing context.
-                </p>
+                </Dialog.Description>
               </div>
-              <button
-                type="button"
-                onClick={() => reset(active)}
+              <Dialog.Close
                 className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
                 aria-label="Close editor"
               >
                 Back to list
                 <X className="h-5 w-5" />
-              </button>
+              </Dialog.Close>
             </div>
 
             {message ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
@@ -473,9 +488,10 @@ export default function LessonContentManager({
                 </div>
               </aside>
             </div>
-          </div>
-        </div>
-      ) : null}
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </section>
   );
 }

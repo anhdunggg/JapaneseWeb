@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import App from './App.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import './index.css';
@@ -13,6 +14,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/*" element={<App />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Toaster richColors position="top-right" />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
