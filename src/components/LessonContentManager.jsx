@@ -61,6 +61,20 @@ function TextArea({ value, onChange, placeholder }) {
   );
 }
 
+function parseCsv(text) {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  if (lines.length < 2) return [];
+
+  const headers = lines[0].split(',').map((header) => header.trim());
+  return lines.slice(1).map((line) => {
+    const values = line.split(',').map((value) => value.trim());
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? '']));
+  });
+}
+
 export default function LessonContentManager({
   lessonId,
   vocabulary,
@@ -75,6 +89,7 @@ export default function LessonContentManager({
   const [editing, setEditing] = useState({ table: '', id: '' });
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [importText, setImportText] = useState('');
 
   const activeItems = { vocabulary, grammar, kanji }[active];
   const editorForm = forms[editorTable];
@@ -175,6 +190,37 @@ export default function LessonContentManager({
     }
 
     toast.success('Đã xóa nội dung.');
+    onChange();
+  }
+
+  async function importItems() {
+    let rows;
+    try {
+      rows = importText.trim().startsWith('[') ? JSON.parse(importText) : parseCsv(importText);
+    } catch {
+      toast.error('Dữ liệu import không hợp lệ.');
+      return;
+    }
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      toast.error('Dữ liệu import phải là JSON array hoặc CSV có header.');
+      return;
+    }
+
+    const allowedKeys = Object.keys(emptyForms[active]);
+    const payload = rows.map((row) => ({
+      ...Object.fromEntries(allowedKeys.map((key) => [key, row[key] ?? emptyForms[active][key]])),
+      lesson_id: lessonId,
+    }));
+
+    const { error } = await supabase.from(active).insert(payload);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success(`Đã import ${payload.length} mục.`);
+    setImportText('');
     onChange();
   }
 
@@ -379,6 +425,28 @@ export default function LessonContentManager({
           ))
         )}
       </div>
+
+      <details className="mt-5 rounded border border-indigo/10 bg-washi p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-indigo">
+          Import JSON/CSV cho {active}
+        </summary>
+        <p className="mt-3 text-sm text-ink/65">
+          Dán một mảng JSON hoặc CSV có header. Các field hợp lệ sẽ theo tab đang chọn.
+        </p>
+        <textarea
+          className="mt-3 min-h-32 w-full rounded border border-indigo/10 bg-white px-3 py-2 text-sm text-indigo focus:outline-none"
+          value={importText}
+          onChange={(event) => setImportText(event.target.value)}
+          placeholder='[{"word":"私","furigana":"わたし","meaning":"tôi"}]'
+        />
+        <button
+          type="button"
+          onClick={importItems}
+          className="mt-3 rounded bg-indigo px-4 py-2 text-sm font-semibold text-washi"
+        >
+          Import
+        </button>
+      </details>
 
       <Dialog.Root
         open={showEditor}

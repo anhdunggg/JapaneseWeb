@@ -9,6 +9,10 @@ const ImageReview = lazy(() => import('./pages/ImageReview'));
 const LessonDetail = lazy(() => import('./pages/LessonDetail'));
 const LessonExercises = lazy(() => import('./pages/LessonExercises'));
 const MistakeReview = lazy(() => import('./pages/MistakeReview'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const StudySession = lazy(() => import('./pages/StudySession'));
+const TodayReview = lazy(() => import('./pages/TodayReview'));
 
 function RouteFallback() {
   return (
@@ -27,10 +31,15 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/lessons/:lessonId" element={<AdminPage />} />
           <Route path="/images/review" element={<ImageReview />} />
           <Route path="/mistakes" element={<MistakeReview />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/review/today" element={<TodayReview />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/lessons/:lessonId" element={<LessonDetail />} />
           <Route path="/lessons/:lessonId/exercises" element={<LessonExercises />} />
+          <Route path="/lessons/:lessonId/study" element={<StudySession />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

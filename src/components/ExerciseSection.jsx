@@ -45,6 +45,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
   const [savingId, setSavingId] = useState('');
   const [message, setMessage] = useState('');
   const [activeType, setActiveType] = useState('all');
+  const [playbackRate, setPlaybackRate] = useState(1);
 
   const grouped = useMemo(
     () =>
@@ -151,8 +152,20 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(exercise.content);
     utterance.lang = 'ja-JP';
-    utterance.rate = 0.85;
+    utterance.rate = playbackRate;
     window.speechSynthesis.speak(utterance);
+  }
+
+  function replayAudio(exercise) {
+    const audio = document.getElementById(`audio-${exercise.id}`);
+    if (!audio) {
+      speakExercise(exercise);
+      return;
+    }
+
+    audio.currentTime = 0;
+    audio.playbackRate = playbackRate;
+    audio.play();
   }
 
   if (exercises.length === 0) {
@@ -227,8 +240,40 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
 
                 {exercise.type === 'listening' ? (
                   <div className="mb-5 rounded bg-washi p-4">
+                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                      {[0.75, 1, 1.25].map((rate) => (
+                        <button
+                          key={rate}
+                          type="button"
+                          onClick={() => setPlaybackRate(rate)}
+                          className={`rounded px-3 py-1.5 text-xs font-semibold ${
+                            playbackRate === rate ? 'bg-indigo text-washi' : 'bg-white text-indigo'
+                          }`}
+                        >
+                          {rate}x
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => replayAudio(exercise)}
+                        className="rounded bg-white px-3 py-1.5 text-xs font-semibold text-vermilion"
+                      >
+                        Replay
+                      </button>
+                    </div>
                     {exercise.audio_url ? (
-                      <audio className="w-full" controls src={exercise.audio_url}>
+                      <audio
+                        id={`audio-${exercise.id}`}
+                        className="w-full"
+                        controls
+                        src={exercise.audio_url}
+                        onLoadedMetadata={(event) => {
+                          event.currentTarget.playbackRate = playbackRate;
+                        }}
+                        onPlay={(event) => {
+                          event.currentTarget.playbackRate = playbackRate;
+                        }}
+                      >
                         <track kind="captions" />
                       </audio>
                     ) : (

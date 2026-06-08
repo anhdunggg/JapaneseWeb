@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowLeft,
@@ -32,6 +32,8 @@ function getLessonNumber(lesson, index) {
 
 export default function AdminPage() {
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const { lessonId: routeLessonId } = useParams();
   const [lessons, setLessons] = useState([]);
   const [selectedLessonId, setSelectedLessonId] = useState('');
   const [lessonForm, setLessonForm] = useState({
@@ -51,7 +53,7 @@ export default function AdminPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  async function loadLessons(nextSelectedId = selectedLessonId) {
+  async function loadLessons(nextSelectedId = routeLessonId || selectedLessonId) {
     setLoading(true);
     setError('');
 
@@ -73,13 +75,26 @@ export default function AdminPage() {
       return titleForLesson(first).localeCompare(titleForLesson(second));
     });
 
+    const nextId =
+      nextSelectedId && sorted.some((lesson) => lesson.id === nextSelectedId)
+        ? nextSelectedId
+        : sorted[0]?.id || '';
     setLessons(sorted);
-    setSelectedLessonId(nextSelectedId || sorted[0]?.id || '');
+    setSelectedLessonId(nextId);
+    if (nextId && routeLessonId !== nextId) {
+      navigate(`/admin/lessons/${nextId}`, { replace: true });
+    }
     setLoading(false);
   }
 
   async function loadLessonContent(lessonId) {
-    if (!lessonId) return;
+    if (!lessonId) {
+      setVocabulary([]);
+      setGrammar([]);
+      setKanji([]);
+      setExercises([]);
+      return;
+    }
 
     const [vocabularyResult, grammarResult, kanjiResult, exercisesResult] =
       await Promise.all([
@@ -111,8 +126,13 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (isAdmin) loadLessons();
+    if (isAdmin) loadLessons(routeLessonId);
   }, [isAdmin]);
+
+  useEffect(() => {
+    if (!routeLessonId) return;
+    setSelectedLessonId(routeLessonId);
+  }, [routeLessonId]);
 
   useEffect(() => {
     loadLessonContent(selectedLessonId);
@@ -156,8 +176,10 @@ export default function AdminPage() {
     }
 
     setMessage(editingLessonId ? 'Đã lưu bài học.' : 'Đã tạo bài học.');
+    const nextId = result.data?.id || selectedLessonId;
     resetLessonForm();
-    loadLessons(result.data?.id || selectedLessonId);
+    if (nextId) navigate(`/admin/lessons/${nextId}`);
+    loadLessons(nextId);
   }
 
   async function deleteLesson(lesson) {
@@ -175,6 +197,7 @@ export default function AdminPage() {
 
     setMessage('Đã xóa bài học.');
     resetLessonForm();
+    navigate('/admin', { replace: true });
     loadLessons('');
   }
 
@@ -266,7 +289,10 @@ export default function AdminPage() {
                   <button
                     key={lesson.id}
                     type="button"
-                    onClick={() => setSelectedLessonId(lesson.id)}
+                    onClick={() => {
+                      setSelectedLessonId(lesson.id);
+                      navigate(`/admin/lessons/${lesson.id}`);
+                    }}
                     className={`flex w-full gap-3 border-b border-indigo/10 p-3 text-left last:border-b-0 ${
                       selected ? 'bg-sakura/25' : 'hover:bg-washi'
                     }`}
@@ -280,6 +306,9 @@ export default function AdminPage() {
                       </span>
                       <span className="block truncate text-sm text-ink/65">
                         {lesson.jlpt_level || 'Lesson'} - {detailForLesson(lesson)}
+                      </span>
+                      <span className="mt-2 inline-flex rounded bg-indigo px-3 py-1 text-xs font-semibold text-washi">
+                        Quản lý nội dung
                       </span>
                     </span>
                   </button>

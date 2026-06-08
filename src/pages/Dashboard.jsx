@@ -166,6 +166,20 @@ export default function Dashboard() {
                 Quản trị
               </Link>
             ) : null}
+            <Link
+              to="/search"
+              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
+            >
+              <Search className="h-4 w-4" />
+              Tìm kiếm
+            </Link>
+            <Link
+              to="/profile"
+              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
+            >
+              <Trophy className="h-4 w-4" />
+              Hồ sơ
+            </Link>
             <button
               type="button"
               onClick={signOut}
@@ -227,6 +241,12 @@ export default function Dashboard() {
                     Tạo quiz nhanh
                   </Link>
                   <Link
+                    to="/review/today"
+                    className="inline-flex items-center gap-2 rounded border border-white/25 px-5 py-3 text-sm font-semibold text-washi"
+                  >
+                    Ôn hôm nay
+                  </Link>
+                  <Link
                     to="/mistakes"
                     className="inline-flex items-center gap-2 rounded border border-white/25 px-5 py-3 text-sm font-semibold text-washi"
                   >
@@ -283,15 +303,24 @@ export default function Dashboard() {
           {[
             { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `${lessons.length} bài trong lộ trình` },
             { icon: Flame, title: 'Cần ôn', value: reviewLessons, detail: 'bài có câu sai gần đây' },
-            { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Done' : '0/1', detail: 'mục tiêu một bài/ngày' },
+            { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Done' : '0/1', detail: 'mục tiêu một bài/ngày', href: '/review/today' },
           ].map((item) => {
             const Icon = item.icon;
-            return (
-              <article key={item.title} className="zen-glass zen-hover p-6 lg:col-span-4">
+            const content = (
+              <>
                 <Icon className="h-5 w-5 text-vermilion" />
                 <p className="mt-4 font-mincho text-4xl">{item.value}</p>
                 <p className="mt-2 font-semibold text-indigo">{item.title}</p>
                 <p className="mt-1 text-sm text-ink/65">{item.detail}</p>
+              </>
+            );
+            return item.href ? (
+              <Link key={item.title} to={item.href} className="zen-glass zen-hover p-6 lg:col-span-4">
+                {content}
+              </Link>
+            ) : (
+              <article key={item.title} className="zen-glass zen-hover p-6 lg:col-span-4">
+                {content}
               </article>
             );
           })}

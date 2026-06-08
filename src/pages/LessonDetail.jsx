@@ -123,6 +123,12 @@ export default function LessonDetail() {
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('vocabulary');
   const [revealedCards, setRevealedCards] = useState({});
+  const studySteps = [
+    { id: 'vocabulary', label: 'Từ vựng', detail: `${vocabulary.length} mục`, icon: Languages },
+    { id: 'kanji', label: 'Kanji', detail: `${kanji.length} chữ`, icon: BookOpenText },
+    { id: 'grammar', label: 'Ngữ pháp', detail: `${grammar.length} điểm`, icon: Brain },
+    { id: 'quiz', label: 'Quiz', detail: 'Luyện tập', icon: CheckCircle2 },
+  ];
 
   function toggleCard(id) {
     setRevealedCards((current) => ({ ...current, [id]: !current[id] }));
@@ -321,6 +327,69 @@ export default function LessonDetail() {
                 </Link>
               </div>
             </motion.section>
+
+            <section className="zen-glass mb-8 p-5">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                    Study mode
+                  </p>
+                  <h2 className="mt-1 font-mincho text-3xl text-indigo">Học theo từng bước</h2>
+                </div>
+                <p className="text-sm text-ink/65">Đi theo flow này để học gọn hơn, không bị lạc giữa nhiều tab.</p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-4">
+                {studySteps.map((step, index) => {
+                  const Icon = step.icon;
+                  const active = activeTab === step.id;
+                  const content = (
+                    <>
+                      <span
+                        className={`flex h-10 w-10 items-center justify-center rounded-full shadow-soft ${
+                          active ? 'bg-indigo text-washi' : 'bg-white text-vermilion'
+                        }`}
+                      >
+                        {step.id === 'quiz' ? <Icon className="h-5 w-5" /> : index + 1}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block font-semibold">{step.label}</span>
+                        <span className="block text-xs text-ink/60">{step.detail}</span>
+                      </span>
+                    </>
+                  );
+
+                  return step.id === 'quiz' ? (
+                  <Link
+                    key={step.id}
+                    to={`/lessons/${lessonId}/exercises`}
+                      className="zen-hover flex items-center gap-3 rounded border border-indigo/10 bg-washi p-4 text-indigo"
+                    >
+                      {content}
+                    </Link>
+                  ) : (
+                    <button
+                      key={step.id}
+                      type="button"
+                      onClick={() => setActiveTab(step.id)}
+                      className={`zen-hover flex items-center gap-3 rounded border p-4 text-left ${
+                        active
+                          ? 'border-vermilion/30 bg-sakura/20 text-indigo'
+                          : 'border-indigo/10 bg-washi text-indigo'
+                      }`}
+                    >
+                      {content}
+                    </button>
+                  );
+                })}
+              </div>
+              <Link
+                to={`/lessons/${lessonId}/study`}
+                className="zen-shimmer mt-4 inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft"
+              >
+                Bắt đầu study session
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </section>
 
             <section>
               <div className="mb-6 flex flex-wrap gap-2">
