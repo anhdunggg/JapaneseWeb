@@ -175,10 +175,10 @@ export default function QuizPanel({
             Practice quiz
           </p>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/70">
-            Users get a fresh random quiz from saved lesson questions. Gemini is only used by admins to expand the bank.
+            Mỗi lần tạo quiz sẽ lấy ngẫu nhiên câu hỏi đã lưu của bài học.
           </p>
           <p className="mt-2 text-sm font-semibold text-indigo">
-            {loadingBank ? 'Loading bank...' : `${questionCount} saved questions`}
+            {loadingBank ? 'Đang tải ngân hàng câu hỏi...' : `${questionCount} câu hỏi đã lưu`}
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:items-end">
@@ -190,7 +190,7 @@ export default function QuizPanel({
               className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura disabled:opacity-70"
             >
               {generatingBank ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <DatabaseZap className="h-4 w-4" />}
-              Generate bank with AI
+              Tạo ngân hàng bằng AI
             </button>
           ) : null}
           <button
@@ -200,7 +200,7 @@ export default function QuizPanel({
             className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95 disabled:opacity-70"
           >
             {creatingQuiz ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Shuffle className="h-4 w-4" />}
-            Create random quiz
+            Tạo quiz ngẫu nhiên
           </button>
         </div>
       </div>
@@ -216,7 +216,7 @@ export default function QuizPanel({
             </div>
             {showResult ? (
               <p className="rounded bg-sakura/30 px-4 py-2 text-sm font-semibold text-indigo">
-                Score: {score}/{quiz.questions.length}
+                Điểm: {score}/{quiz.questions.length}
               </p>
             ) : null}
           </div>
@@ -224,7 +224,16 @@ export default function QuizPanel({
           {quiz.questions.map((question, index) => {
             const isCorrect = normalizeAnswer(answers[question.id]) === normalizeAnswer(question.answer);
             return (
-              <article key={question.id} className="zen-hover rounded border border-indigo/10 bg-white/85 p-4 shadow-soft">
+              <article
+                key={question.id}
+                className={`zen-hover rounded border p-4 shadow-soft ${
+                  showResult
+                    ? isCorrect
+                      ? 'border-emerald-200 bg-emerald-50/80'
+                      : 'border-vermilion/25 bg-vermilion/10'
+                    : 'border-indigo/10 bg-white/85'
+                }`}
+              >
                 <div className="mb-3 flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
@@ -261,18 +270,18 @@ export default function QuizPanel({
                     onChange={(event) =>
                       setAnswers((current) => ({ ...current, [question.id]: event.target.value }))
                     }
-                    placeholder="Your answer"
+                    placeholder="Nhập câu trả lời"
                   />
                 )}
 
                 {showResult ? (
                   <div className="mt-3 rounded bg-mist p-3 text-sm leading-6 text-ink/75">
                     <p>
-                      <span className="font-semibold text-indigo">Answer:</span> {question.answer}
+                      <span className="font-semibold text-indigo">Đáp án:</span> {question.answer}
                     </p>
                     <p>{question.explanation}</p>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-vermilion">
-                      Source: {question.source}
+                      Nguồn: {question.source}
                     </p>
                   </div>
                 ) : null}
@@ -286,7 +295,7 @@ export default function QuizPanel({
               onClick={() => setShowResult(true)}
               className="zen-shimmer rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
             >
-              Check answers
+              Kiểm tra đáp án
             </button>
             {saveHistory ? (
               <button
@@ -296,11 +305,11 @@ export default function QuizPanel({
                 className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
               >
                 {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                Save attempt
+                Lưu kết quả
               </button>
             ) : showResult ? (
               <p className="rounded bg-washi px-4 py-3 text-sm font-semibold text-ink/70">
-                Admin preview: history is not saved.
+                Admin xem thử: không lưu lịch sử.
               </p>
             ) : null}
           </div>

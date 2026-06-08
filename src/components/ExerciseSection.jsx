@@ -148,8 +148,8 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
   if (exercises.length === 0) {
     return (
       <section className="zen-glass mb-8 p-6">
-        <h2 className="font-mincho text-3xl">Exercises</h2>
-        <p className="mt-3 text-sm text-ink/70">No exercises have been added for this lesson yet.</p>
+        <h2 className="font-mincho text-3xl">Bài tập</h2>
+        <p className="mt-3 text-sm text-ink/70">Bài học này chưa có bài tập.</p>
       </section>
     );
   }
@@ -159,9 +159,9 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
       <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-            Practice room
+            Phòng luyện tập
           </p>
-          <h2 className="mt-2 font-mincho text-3xl">Exercises</h2>
+          <h2 className="mt-2 font-mincho text-3xl">Bài tập</h2>
         </div>
         <div className="flex flex-wrap gap-2">
           {typeTabs.map((tab) => (
@@ -188,7 +188,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
 
       {visibleExerciseCount === 0 ? (
         <p className="zen-glass p-5 text-sm text-ink/70">
-          No {activeType === 'all' ? '' : activeType} exercises are available yet.
+          Chưa có bài tập {activeType === 'all' ? '' : activeType}.
         </p>
       ) : null}
 
@@ -228,7 +228,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                         className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
                       >
                         <Volume2 className="h-4 w-4" />
-                        Play listening audio
+                        Nghe audio
                       </button>
                     )}
                     {exercise.content ? (
@@ -248,7 +248,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                           ) : (
                             <Eye className="h-4 w-4" />
                           )}
-                          {visibleTranscripts[exercise.id] ? 'Hide transcript' : 'Show transcript'}
+                          {visibleTranscripts[exercise.id] ? 'Ẩn transcript' : 'Hiện transcript'}
                         </button>
                         {visibleTranscripts[exercise.id] ? (
                           <div className="mt-3 whitespace-pre-line rounded bg-white/80 p-4 leading-7 text-ink/80">
@@ -273,7 +273,16 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                       normalizeAnswer(answerValue) === normalizeAnswer(answerKey[key]);
 
                     return (
-                      <div key={key} className="zen-hover rounded border border-indigo/10 bg-white/85 p-4 shadow-soft">
+                      <div
+                        key={key}
+                        className={`zen-hover rounded border p-4 shadow-soft ${
+                          checked
+                            ? isCorrect
+                              ? 'border-emerald-200 bg-emerald-50/80'
+                              : 'border-vermilion/25 bg-vermilion/10'
+                            : 'border-indigo/10 bg-white/85'
+                        }`}
+                      >
                         <div className="mb-3 flex items-start justify-between gap-4">
                           <p className="font-semibold text-indigo">
                             {index + 1}. {question.prompt}
@@ -311,13 +320,13 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                                 [`${exercise.id}:${key}`]: event.target.value,
                               }))
                             }
-                            placeholder="Your answer"
+                            placeholder="Nhập câu trả lời"
                           />
                         )}
 
                         {checked ? (
                           <p className="mt-3 rounded bg-mist p-3 text-sm text-ink/75">
-                            Answer: <span className="font-semibold text-indigo">{answerKey[key]}</span>
+                            Đáp án: <span className="font-semibold text-indigo">{answerKey[key]}</span>
                           </p>
                         ) : null}
                       </div>
@@ -332,7 +341,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                       onClick={() => setCheckedExerciseId(exercise.id)}
                       className="zen-shimmer rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
                     >
-                      Check exercise
+                      Kiểm tra bài
                     </button>
                     {saveHistory ? (
                       <button
@@ -342,16 +351,16 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                         className="zen-hover inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft disabled:opacity-60"
                       >
                         {savingId === exercise.id ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                        Save attempt
+                        Lưu kết quả
                       </button>
                     ) : checked ? (
                       <p className="rounded bg-washi px-4 py-3 text-sm font-semibold text-ink/70">
-                        Admin preview: history is not saved.
+                        Admin xem thử: không lưu lịch sử.
                       </p>
                     ) : null}
                     {checked ? (
                       <p className="text-sm font-semibold text-indigo">
-                        Score: {scoreFor(exercise)}/{questions.length}
+                        Điểm: {scoreFor(exercise)}/{questions.length}
                       </p>
                     ) : null}
                   </div>

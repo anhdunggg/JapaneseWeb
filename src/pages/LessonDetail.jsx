@@ -6,14 +6,13 @@ import {
   ArrowRight,
   BookOpenText,
   Brain,
-  ChevronDown,
   ImageOff,
   Languages,
   LoaderCircle,
+  Settings,
   Sparkles,
 } from 'lucide-react';
 import { supabase } from '../supabaseClient';
-import LessonContentManager from '../components/LessonContentManager';
 import { useAuth } from '../context/AuthContext';
 import { getPlaceholderLabel, isPlaceholderImage } from '../lib/imageUtils';
 
@@ -145,7 +144,6 @@ export default function LessonDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('vocabulary');
-  const [showAdminTools, setShowAdminTools] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -214,7 +212,7 @@ export default function LessonDetail() {
           className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to lessons
+          Về danh sách bài
         </Link>
 
         {error ? (
@@ -229,7 +227,7 @@ export default function LessonDetail() {
                 <div>
                   <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                     <BookOpenText className="h-4 w-4" />
-                    Lesson
+                    Bài học
                   </p>
                   <h1 className="font-mincho text-4xl">{titleForLesson(lesson)}</h1>
                   <p className="mt-4 max-w-3xl leading-7 text-ink/75">
@@ -245,45 +243,26 @@ export default function LessonDetail() {
                   to={`/lessons/${lessonId}/exercises`}
                   className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95"
                 >
-                  Open exercises
+                  Mở bài tập
                   <ArrowRight className="h-4 w-4" />
                 </Link>
+                {isAdmin ? (
+                  <Link
+                    to="/admin"
+                    className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/75 px-5 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Quản trị nội dung
+                  </Link>
+                ) : null}
               </div>
             </section>
-
-            {isAdmin ? (
-              <section className="mb-8">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminTools((current) => !current)}
-                  className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/80 px-4 py-3 text-sm font-semibold text-indigo shadow-soft"
-                >
-                  Admin tools
-                  <ChevronDown
-                    className={`h-4 w-4 transition ${
-                      showAdminTools ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                {showAdminTools ? (
-                  <div className="mt-4">
-                    <LessonContentManager
-                      lessonId={lessonId}
-                      vocabulary={vocabulary}
-                      grammar={grammar}
-                      kanji={kanji}
-                      onChange={() => setRefreshKey((current) => current + 1)}
-                    />
-                  </div>
-                ) : null}
-              </section>
-            ) : null}
 
             <section>
               <div className="mb-6 flex flex-wrap gap-2">
                 {[
-                  { id: 'vocabulary', label: 'Vocabulary', count: vocabulary.length },
-                  { id: 'grammar', label: 'Grammar', count: grammar.length },
+                  { id: 'vocabulary', label: 'Từ vựng', count: vocabulary.length },
+                  { id: 'grammar', label: 'Ngữ pháp', count: grammar.length },
                   { id: 'kanji', label: 'Kanji', count: kanji.length },
                 ].map((tab) => (
                   <button
@@ -309,10 +288,10 @@ export default function LessonDetail() {
                   <div className="mb-4 flex items-center justify-between gap-4">
                     <h2 className="flex items-center gap-2 font-mincho text-3xl">
                       <Languages className="h-6 w-6 text-vermilion" />
-                      Vocabulary
+                      Từ vựng
                     </h2>
                     <span className="text-sm font-semibold text-ink/60">
-                      {vocabulary.length} items
+                      {vocabulary.length} mục
                     </span>
                   </div>
                   {vocabulary.length === 0 ? <EmptySection label="vocabulary" /> : null}
@@ -363,10 +342,10 @@ export default function LessonDetail() {
                   <div className="mb-4 flex items-center justify-between gap-4">
                     <h2 className="flex items-center gap-2 font-mincho text-3xl">
                       <Brain className="h-6 w-6 text-vermilion" />
-                      Grammar
+                      Ngữ pháp
                     </h2>
                     <span className="text-sm font-semibold text-ink/60">
-                      {grammar.length} points
+                      {grammar.length} điểm
                     </span>
                   </div>
                   {grammar.length === 0 ? <EmptySection label="grammar" /> : null}
@@ -407,7 +386,7 @@ export default function LessonDetail() {
                       Kanji
                     </h2>
                     <span className="text-sm font-semibold text-ink/60">
-                      {kanji.length} characters
+                      {kanji.length} chữ
                     </span>
                   </div>
                   {kanji.length === 0 ? <EmptySection label="kanji" /> : null}

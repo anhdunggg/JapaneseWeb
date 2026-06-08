@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminPage from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import ImageReview from './pages/ImageReview';
@@ -13,6 +14,7 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="/images/review" element={<ImageReview />} />
         <Route path="/lessons/:lessonId" element={<LessonDetail />} />
         <Route path="/lessons/:lessonId/exercises" element={<LessonExercises />} />

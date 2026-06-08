@@ -4,7 +4,6 @@ import {
   AlertCircle,
   ArrowLeft,
   BookOpenText,
-  ChevronDown,
   CheckCircle2,
   LoaderCircle,
   Settings,
@@ -12,7 +11,6 @@ import {
   Target,
   XCircle,
 } from 'lucide-react';
-import ExerciseManager from '../components/ExerciseManager';
 import ExerciseSection from '../components/ExerciseSection';
 import QuizPanel from '../components/QuizPanel';
 import { useAuth } from '../context/AuthContext';
@@ -268,11 +266,10 @@ export default function LessonExercises() {
   const [exercises, setExercises] = useState([]);
   const [quizAttempts, setQuizAttempts] = useState([]);
   const [exerciseAttempts, setExerciseAttempts] = useState([]);
-  const [refreshKey, setRefreshKey] = useState(0);
   const [attemptRefreshKey, setAttemptRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showAdminTools, setShowAdminTools] = useState(true);
+  const [activeMode, setActiveMode] = useState('quiz');
 
   useEffect(() => {
     if (!user?.id) return;
@@ -350,7 +347,7 @@ export default function LessonExercises() {
     return () => {
       mounted = false;
     };
-  }, [isAdmin, lessonId, refreshKey, attemptRefreshKey, user?.id]);
+  }, [isAdmin, lessonId, attemptRefreshKey, user?.id]);
 
   if (loading) {
     return (
@@ -372,13 +369,13 @@ export default function LessonExercises() {
             className="inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to theory
+            Về lý thuyết
           </Link>
           <Link
             to="/dashboard"
             className="inline-flex items-center gap-2 text-sm font-semibold text-ink/65 transition hover:text-indigo"
           >
-            Back to lessons
+            Về danh sách bài
           </Link>
         </div>
 
@@ -394,7 +391,7 @@ export default function LessonExercises() {
                 <div>
                   <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                     <BookOpenText className="h-4 w-4" />
-                    Exercises
+                    Bài tập
                   </p>
                   <h1 className="font-mincho text-4xl">
                     {titleForLesson(lesson)}
@@ -410,37 +407,46 @@ export default function LessonExercises() {
             </section>
 
             {isAdmin ? (
-              <section className="mb-8">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminTools((current) => !current)}
-                  className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
-                >
-                  <Settings className="h-4 w-4 text-vermilion" />
-                  Exercise manager
-                  <ChevronDown
-                    className={`h-4 w-4 transition ${showAdminTools ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                <div
-                  className={`grid transition-all duration-300 ${
-                    showAdminTools
-                      ? 'mt-4 grid-rows-[1fr] opacity-100'
-                      : 'grid-rows-[0fr] opacity-0'
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <ExerciseManager
-                      lessonId={lessonId}
-                      exercises={exercises}
-                      onChange={() => setRefreshKey((current) => current + 1)}
-                    />
-                  </div>
+              <section className="mb-8 rounded border border-indigo/10 bg-white/80 p-4 text-sm text-ink/70 shadow-soft">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p>
+                    Admin đang ở chế độ xem thử. Kết quả luyện tập sẽ không lưu lịch sử.
+                  </p>
+                  <Link
+                    to="/admin"
+                    className="inline-flex items-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Quản trị bài tập
+                  </Link>
                 </div>
               </section>
             ) : null}
 
-            {!isAdmin ? (
+            <section className="zen-glass mb-8 p-4">
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'quiz', label: 'Quiz nhanh' },
+                  { id: 'exercises', label: 'Bài tập' },
+                  ...(!isAdmin ? [{ id: 'history', label: 'Lịch sử' }] : []),
+                ].map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => setActiveMode(mode.id)}
+                    className={`rounded px-4 py-3 text-sm font-semibold transition ${
+                      activeMode === mode.id
+                        ? 'bg-indigo text-washi shadow-soft'
+                        : 'bg-washi text-indigo hover:ring-1 hover:ring-sakura'
+                    }`}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {!isAdmin && activeMode === 'history' ? (
               <ProgressPanel
                 quizAttempts={quizAttempts}
                 exerciseAttempts={exerciseAttempts}
@@ -448,20 +454,24 @@ export default function LessonExercises() {
               />
             ) : null}
 
-            <QuizPanel
-              lesson={lesson}
-              vocabulary={vocabulary}
-              grammar={grammar}
-              kanji={kanji}
-              saveHistory={!isAdmin}
-              onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
-            />
+            {activeMode === 'quiz' ? (
+              <QuizPanel
+                lesson={lesson}
+                vocabulary={vocabulary}
+                grammar={grammar}
+                kanji={kanji}
+                saveHistory={!isAdmin}
+                onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
+              />
+            ) : null}
 
-            <ExerciseSection
-              exercises={exercises}
-              saveHistory={!isAdmin}
-              onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
-            />
+            {activeMode === 'exercises' ? (
+              <ExerciseSection
+                exercises={exercises}
+                saveHistory={!isAdmin}
+                onAttemptSaved={() => setAttemptRefreshKey((current) => current + 1)}
+              />
+            ) : null}
           </>
         )}
       </div>
