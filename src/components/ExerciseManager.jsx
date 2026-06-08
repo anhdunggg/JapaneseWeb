@@ -61,7 +61,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
       answerKey = JSON.parse(form.answerKeyText || '{}');
     } catch {
       setSaving(false);
-      setMessage('Questions and answer key must be valid JSON.');
+      setMessage('Câu hỏi và đáp án phải là JSON hợp lệ.');
       return;
     }
 
@@ -105,9 +105,9 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
     <section className="zen-glass mb-8 p-6">
       <div className="mb-5">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-          Exercise management
+          Quản lý bài tập
         </p>
-        <h2 className="mt-2 font-mincho text-3xl">{editingId ? 'Edit Exercise' : 'Add Exercise'}</h2>
+        <h2 className="mt-2 font-mincho text-3xl">{editingId ? 'Sửa bài tập' : 'Thêm bài tập'}</h2>
       </div>
 
       {message ? <p className="mb-4 rounded bg-sakura/20 px-4 py-3 text-sm text-indigo">{message}</p> : null}
@@ -117,15 +117,15 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
           <select className={fieldClass()} value={form.type} onChange={(event) => updateField('type', event.target.value)}>
             <option value="reading">Reading</option>
             <option value="listening">Listening</option>
-            <option value="practice">Practice</option>
+            <option value="practice">Thực hành</option>
           </select>
-          <input className={fieldClass()} value={form.title} onChange={(event) => updateField('title', event.target.value)} placeholder="Exercise title" required />
+          <input className={fieldClass()} value={form.title} onChange={(event) => updateField('title', event.target.value)} placeholder="Tiêu đề bài tập" required />
         </div>
         <input className={fieldClass()} value={form.instructions} onChange={(event) => updateField('instructions', event.target.value)} placeholder="Instructions" />
         <input className={fieldClass()} value={form.audio_url} onChange={(event) => updateField('audio_url', event.target.value)} placeholder="Audio URL for listening exercises" />
         <textarea className={`${fieldClass()} min-h-32`} value={form.content} onChange={(event) => updateField('content', event.target.value)} placeholder="Reading passage, listening transcript, or practice content" />
         <div className="grid gap-3 lg:grid-cols-2">
-          <textarea className={`${fieldClass()} min-h-44 font-mono`} value={form.questionsText} onChange={(event) => updateField('questionsText', event.target.value)} placeholder="Questions JSON" />
+          <textarea className={`${fieldClass()} min-h-44 font-mono`} value={form.questionsText} onChange={(event) => updateField('questionsText', event.target.value)} placeholder="JSON câu hỏi" />
           <textarea className={`${fieldClass()} min-h-44 font-mono`} value={form.answerKeyText} onChange={(event) => updateField('answerKeyText', event.target.value)} placeholder="Answer key JSON" />
         </div>
         <div className="flex gap-2">
@@ -143,7 +143,7 @@ export default function ExerciseManager({ lessonId, exercises, onChange }) {
 
       <div className="mt-6 rounded border border-indigo/10">
         {exercises.length === 0 ? (
-          <p className="p-4 text-sm text-ink/70">No exercises yet.</p>
+          <p className="p-4 text-sm text-ink/70">Chưa có bài tập nào.</p>
         ) : (
           exercises.map((exercise) => (
             <div key={exercise.id} className="flex items-center justify-between gap-4 border-b border-indigo/10 p-3 last:border-b-0">

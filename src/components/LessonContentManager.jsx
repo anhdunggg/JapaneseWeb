@@ -289,7 +289,7 @@ export default function LessonContentManager({
           />
         ) : (
           <div className="flex h-52 items-center justify-center rounded bg-white/80 text-sm text-ink/60 ring-1 ring-indigo/10">
-            No image URL
+            Chưa có URL ảnh
           </div>
         )}
         <p className="mt-3 break-all text-xs leading-5 text-ink/60">
@@ -342,9 +342,9 @@ export default function LessonContentManager({
     <section className="zen-glass mb-8 p-6">
       <div className="mb-5">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-          Lesson content CRUD
+          Nội dung bài học
         </p>
-        <h2 className="mt-2 font-mincho text-3xl">Manage Study Material</h2>
+        <h2 className="mt-2 font-mincho text-3xl">Quản lý học liệu</h2>
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
@@ -380,7 +380,7 @@ export default function LessonContentManager({
 
       <div className="max-h-80 overflow-auto rounded border border-indigo/10">
         {activeItems.length === 0 ? (
-          <p className="p-4 text-sm text-ink/70">No items yet.</p>
+          <p className="p-4 text-sm text-ink/70">Chưa có mục nào.</p>
         ) : (
           activeItems.map((item) => (
             <div key={item.id} className="flex items-center justify-between gap-4 border-b border-indigo/10 p-3 last:border-b-0">
@@ -478,7 +478,7 @@ export default function LessonContentManager({
                 className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
                 aria-label="Close editor"
               >
-                Back to list
+                Về danh sách
                 <X className="h-5 w-5" />
               </Dialog.Close>
             </div>

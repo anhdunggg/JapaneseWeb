@@ -12,11 +12,8 @@ import {
   Flame,
   Layers3,
   LoaderCircle,
-  LogOut,
   Map,
   Search,
-  Settings,
-  Sparkles,
   Target,
   Trophy,
 } from 'lucide-react';
@@ -42,7 +39,7 @@ function getSortableLessonNumber(lesson, index) {
 }
 
 export default function Dashboard() {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [lessons, setLessons] = useState([]);
   const [progress, setProgress] = useState({});
   const [counts, setCounts] = useState({ vocabulary: 0, grammar: 0, kanji: 0 });
@@ -151,43 +148,10 @@ export default function Dashboard() {
         <header className="mb-8 flex flex-col gap-5 border-b border-indigo/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-              Mochi Study
+              Tổng quan
             </p>
-            <h1 className="mt-2 font-mincho text-4xl">Hành trình học</h1>
-            <p className="mt-2 text-sm text-ink/70">{user?.email}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {isAdmin ? (
-              <Link
-                to="/admin"
-                className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
-              >
-                <Settings className="h-4 w-4" />
-                Quản trị
-              </Link>
-            ) : null}
-            <Link
-              to="/search"
-              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
-            >
-              <Search className="h-4 w-4" />
-              Tìm kiếm
-            </Link>
-            <Link
-              to="/profile"
-              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
-            >
-              <Trophy className="h-4 w-4" />
-              Hồ sơ
-            </Link>
-            <button
-              type="button"
-              onClick={signOut}
-              className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/85 px-4 py-2 text-sm font-semibold text-indigo shadow-soft"
-            >
-              <LogOut className="h-4 w-4" />
-              Đăng xuất
-            </button>
+            <h1 className="mt-2 font-mincho text-4xl">Bảng học tập</h1>
+            <p className="mt-2 text-sm text-ink/70">Theo dõi bài học, ôn tập và tiến độ của bạn.</p>
           </div>
         </header>
 
@@ -205,7 +169,7 @@ export default function Dashboard() {
             </div>
             <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-sakura">
               <Target className="h-4 w-4" />
-              Nhiệm vụ hôm nay
+              Hôm nay
             </p>
             <h2 className="font-mincho text-5xl leading-tight">
               15 phút học tập có mục tiêu
@@ -218,7 +182,7 @@ export default function Dashboard() {
               {['Ôn lý thuyết', 'Làm quiz ngắn', 'Sửa câu sai'].map((step, index) => (
                 <div key={step} className="rounded border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
-                    Step {index + 1}
+                    Bước {index + 1}
                   </p>
                   <p className="mt-1 font-semibold text-washi">{step}</p>
                 </div>
@@ -231,7 +195,7 @@ export default function Dashboard() {
                     to={`/lessons/${nextLesson.id}`}
                     className="zen-shimmer inline-flex items-center gap-2 rounded bg-washi px-5 py-3 text-sm font-semibold text-indigo shadow-soft"
                   >
-                    Bắt đầu nhiệm vụ
+                    Bắt đầu học
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
@@ -303,7 +267,7 @@ export default function Dashboard() {
           {[
             { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `${lessons.length} bài trong lộ trình` },
             { icon: Flame, title: 'Cần ôn', value: reviewLessons, detail: 'bài có câu sai gần đây' },
-            { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Done' : '0/1', detail: 'mục tiêu một bài/ngày', href: '/review/today' },
+            { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Xong' : '0/1', detail: 'mục tiêu một bài/ngày', href: '/review/today' },
           ].map((item) => {
             const Icon = item.icon;
             const content = (
@@ -337,7 +301,7 @@ export default function Dashboard() {
               <div>
                 <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                   <Layers3 className="h-4 w-4" />
-                  Learning path
+                  Lộ trình học
                 </p>
                 <h2 className="mt-2 font-mincho text-3xl text-indigo">Đường học gần nhất</h2>
               </div>
@@ -369,7 +333,7 @@ export default function Dashboard() {
                       {getLessonTitle(lesson, index)}
                     </span>
                     <span className="mt-2 block text-[11px] uppercase tracking-[0.14em]">
-                      {completed ? 'Done' : current ? 'Next' : 'Locked'}
+                      {completed ? 'Đã xong' : current ? 'Tiếp theo' : 'Chưa mở'}
                     </span>
                   </Link>
                 );
@@ -457,7 +421,7 @@ export default function Dashboard() {
                           <CheckCircle2 className="h-6 w-6 text-emerald-500" />
                         ) : review ? (
                           <span className="rounded bg-vermilion/10 px-2 py-1 text-xs font-semibold text-vermilion">
-                            Review
+                            Cần ôn
                           </span>
                         ) : (
                           <span className="rounded bg-sakura/25 px-2 py-1 text-xs font-semibold text-vermilion">

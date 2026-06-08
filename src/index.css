@@ -47,6 +47,20 @@ body::before {
   mask-image: linear-gradient(to bottom, black, transparent 78%);
 }
 
+body.theme-night {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 183, 197, 0.1), transparent 28rem),
+    radial-gradient(circle at 88% 18%, rgba(230, 126, 34, 0.12), transparent 30rem),
+    linear-gradient(135deg, #101923, #172534 48%, #0f1720);
+  color: #fdfbf7;
+}
+
+body.theme-night::before {
+  background-image:
+    linear-gradient(rgba(253, 251, 247, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(253, 251, 247, 0.035) 1px, transparent 1px);
+}
+
 button,
 input,
 select,
@@ -156,4 +170,54 @@ a:focus-visible {
     min-height: 330px;
   }
 
+  .empty-state {
+    @apply relative overflow-hidden rounded bg-white/85 p-6 text-center text-ink/70 shadow-zen ring-1 ring-indigo/5 backdrop-blur;
+  }
+
+  .skeleton-line {
+    @apply animate-pulse rounded bg-mist;
+  }
+
+}
+
+body.theme-night .zen-glass,
+body.theme-night .bg-white,
+body.theme-night .bg-white\/80,
+body.theme-night .bg-white\/85,
+body.theme-night .bg-white\/90 {
+  background-color: rgba(23, 37, 52, 0.86) !important;
+}
+
+body.theme-night .bg-washi,
+body.theme-night .bg-washi\/80,
+body.theme-night .bg-mist {
+  background-color: rgba(44, 62, 80, 0.58) !important;
+}
+
+body.theme-night .text-indigo,
+body.theme-night .text-ink,
+body.theme-night .text-ink\/65,
+body.theme-night .text-ink\/70,
+body.theme-night .text-ink\/75 {
+  color: rgba(253, 251, 247, 0.88) !important;
+}
+
+body.theme-night input,
+body.theme-night select,
+body.theme-night textarea {
+  color: #fdfbf7;
+}
+
+body.theme-night nav[aria-label="Breadcrumb"] {
+  color: rgba(253, 251, 247, 0.72);
+}
+
+body.theme-night nav[aria-label="Breadcrumb"] .text-vermilion {
+  color: #ffb36b !important;
+}
+
+body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/35,
+body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/55,
+body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/65 {
+  color: rgba(253, 251, 247, 0.72) !important;
 }

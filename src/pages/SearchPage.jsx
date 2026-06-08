@@ -61,7 +61,7 @@ export default function SearchPage() {
       .filter((item) => includes(lessonTitle(item), normalized) || includes(item.description, normalized))
       .map((item) => ({
         id: `lesson:${item.id}`,
-        type: 'Lesson',
+        type: 'Bài học',
         icon: BookOpenText,
         title: lessonTitle(item),
         detail: item.description || item.jlpt_level || '',
@@ -123,9 +123,9 @@ export default function SearchPage() {
         <section className="zen-glass mb-6 p-7">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <Search className="h-4 w-4" />
-            Global Search
+            Tìm kiếm
           </p>
-          <h1 className="font-mincho text-4xl">Tìm nhanh nội dung học</h1>
+          <h1 className="font-mincho text-4xl">Tìm nội dung học</h1>
           <label className="mt-6 flex items-center gap-3 rounded border border-indigo/10 bg-washi px-4 py-3">
             <Search className="h-5 w-5 text-vermilion" />
             <input

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { ArrowLeft, ArrowRight, CheckCircle2, LoaderCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +27,7 @@ export default function StudySession() {
   const [kanji, setKanji] = useState([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [feedback, setFeedback] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,8 +70,12 @@ export default function StudySession() {
     });
 
     toast.success(status === 'known' ? 'Đã đánh dấu Nhớ rồi.' : 'Đã đưa vào Ôn hôm nay.');
-    setRevealed(false);
-    setIndex((current) => Math.min(cards.length - 1, current + 1));
+    setFeedback(status);
+    window.setTimeout(() => {
+      setFeedback('');
+      setRevealed(false);
+      setIndex((current) => Math.min(cards.length - 1, current + 1));
+    }, 240);
   }
 
   if (loading) {
@@ -92,7 +98,7 @@ export default function StudySession() {
         </Link>
 
         <section className="zen-glass mb-6 p-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">Study Session</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">Phiên học</p>
           <h1 className="mt-2 font-mincho text-4xl">{lesson?.title || 'Lesson'}</h1>
           <div className="mt-5 h-2 overflow-hidden rounded bg-washi">
             <div className="h-full rounded bg-gradient-to-r from-vermilion to-sakura" style={{ width: `${progress}%` }} />
@@ -103,7 +109,18 @@ export default function StudySession() {
         {!card ? (
           <section className="zen-glass p-6 text-ink/70">Lesson này chưa có từ vựng hoặc kanji để học theo session.</section>
         ) : (
-          <section className="zen-glass p-6 text-center">
+          <motion.section
+            key={card.item_id}
+            className="zen-glass p-6 text-center"
+            animate={
+              feedback === 'known'
+                ? { scale: [1, 1.025, 1], boxShadow: '0 20px 50px rgba(16, 185, 129, 0.18)' }
+                : feedback === 'weak'
+                  ? { x: [0, -8, 8, -4, 0], boxShadow: '0 20px 50px rgba(230, 126, 34, 0.18)' }
+                  : { scale: 1, x: 0 }
+            }
+            transition={{ duration: 0.24 }}
+          >
             {card.image_url ? (
               <img
                 src={card.image_url}
@@ -159,7 +176,7 @@ export default function StudySession() {
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
-          </section>
+          </motion.section>
         )}
       </div>
     </main>

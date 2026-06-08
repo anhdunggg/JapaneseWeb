@@ -151,7 +151,7 @@ export default function MistakeReview() {
         <section className="zen-glass mb-8 p-7">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <XCircle className="h-4 w-4" />
-            Mistake Review
+            Ôn câu sai
           </p>
           <h1 className="font-mincho text-4xl">Ôn lại câu sai</h1>
           <p className="mt-4 max-w-3xl leading-7 text-ink/75">

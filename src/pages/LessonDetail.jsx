@@ -44,13 +44,13 @@ function titleForLesson(lesson) {
 }
 
 function detailForLesson(lesson) {
-  return pick(lesson, ['description', 'summary', 'content', 'notes'], 'Review the lesson material below.');
+  return pick(lesson, ['description', 'summary', 'content', 'notes'], 'Ôn lại nội dung của bài học này.');
 }
 
 function EmptySection({ label }) {
   return (
     <p className="rounded border border-indigo/10 bg-washi p-4 text-sm text-ink/70">
-      No {label} items are visible for this lesson yet.
+      Chưa có mục {label} trong bài học này.
     </p>
   );
 }
@@ -222,7 +222,7 @@ export default function LessonDetail() {
       <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
         <div className="zen-glass flex items-center gap-3 px-5 py-4">
           <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
-          <span className="text-sm font-medium">Opening lesson...</span>
+          <span className="text-sm font-medium">Đang mở bài học...</span>
         </div>
       </main>
     );
@@ -242,7 +242,7 @@ export default function LessonDetail() {
         {error ? (
           <div className="flex items-start gap-3 rounded border border-vermilion/20 bg-vermilion/10 p-5 text-sm leading-6">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-vermilion" />
-            <p>Could not load this lesson: {error}</p>
+            <p>Không tải được bài học: {error}</p>
           </div>
         ) : (
           <>

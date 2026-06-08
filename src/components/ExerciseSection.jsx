@@ -10,6 +10,7 @@ import {
   Save,
   Volume2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
@@ -98,7 +99,8 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
 
   async function saveAttempt(exercise) {
     if (!saveHistory) {
-      setMessage('Admin preview mode: exercise history is not saved.');
+      setMessage('Chế độ xem thử của quản trị viên: không lưu lịch sử bài tập.');
+      toast.info('Chế độ xem thử của quản trị viên: không lưu lịch sử bài tập.');
       return;
     }
 
@@ -125,7 +127,8 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
     setSavingId('');
 
     if (error) {
-      setMessage(`Could not save exercise attempt: ${error.message}`);
+      setMessage(`Không lưu được kết quả bài tập: ${error.message}`);
+      toast.error(`Không lưu được kết quả bài tập: ${error.message}`);
       return;
     }
 
@@ -139,13 +142,15 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
       completed_at: scoreFor(exercise) === questions.length ? new Date().toISOString() : null,
     });
 
-    setMessage('Exercise attempt saved.');
+    setMessage('Đã lưu kết quả bài tập.');
+    toast.success('Đã lưu kết quả bài tập.');
     onAttemptSaved?.();
   }
 
   function speakExercise(exercise) {
     if (!window.speechSynthesis) {
       setMessage('Speech playback is not supported in this browser.');
+      toast.error('Speech playback is not supported in this browser.');
       return;
     }
 

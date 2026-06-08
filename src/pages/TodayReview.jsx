@@ -147,7 +147,7 @@ export default function TodayReview() {
         <section className="quest-hero zen-glass mb-8 p-7 text-washi">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-sakura">
             <Flame className="h-4 w-4" />
-            Spaced Review
+            Ôn tập giãn cách
           </p>
           <h1 className="font-mincho text-4xl">Ôn hôm nay</h1>
           <p className="mt-4 max-w-3xl leading-7 text-washi/80">

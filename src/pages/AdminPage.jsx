@@ -238,7 +238,7 @@ export default function AdminPage() {
               Về trang học
             </Link>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-              Admin
+              Quản trị
             </p>
             <h1 className="font-mincho text-4xl">Quản trị nội dung học</h1>
           </div>
@@ -305,7 +305,7 @@ export default function AdminPage() {
                         {titleForLesson(lesson, index)}
                       </span>
                       <span className="block truncate text-sm text-ink/65">
-                        {lesson.jlpt_level || 'Lesson'} - {detailForLesson(lesson)}
+                        {lesson.jlpt_level || 'Bài học'} - {detailForLesson(lesson)}
                       </span>
                       <span className="mt-2 inline-flex rounded bg-indigo px-3 py-1 text-xs font-semibold text-washi">
                         Quản lý nội dung
@@ -322,7 +322,7 @@ export default function AdminPage() {
               <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-                    Lesson
+                    Bài học
                   </p>
                   <h2 className="mt-2 font-mincho text-3xl">
                     {editingLessonId ? 'Sửa bài học' : 'Tạo bài học'}

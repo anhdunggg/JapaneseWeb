@@ -62,13 +62,13 @@ export default function ImageReview() {
       <div className="mx-auto max-w-6xl">
         <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
           <ArrowLeft className="h-4 w-4" />
-          Back to dashboard
+          Về trang chủ
         </Link>
 
         {!isAdmin ? (
           <section className="zen-glass p-7">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-              Admin only
+              Chỉ dành cho quản trị viên
             </p>
             <h1 className="mt-2 font-mincho text-3xl">Image review is restricted.</h1>
           </section>
@@ -80,9 +80,9 @@ export default function ImageReview() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">Vocabulary images</p>
-              <h1 className="mt-2 font-mincho text-4xl">Image Review</h1>
+              <h1 className="mt-2 font-mincho text-4xl">Duyệt ảnh từ vựng</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/70">
-                Review recent vocabulary images. Paste a better Wikimedia or public image URL, or clear a bad image for later replacement.
+                Kiểm tra ảnh từ vựng gần đây. Dán URL ảnh phù hợp hơn hoặc xóa ảnh sai để thay sau.
               </p>
             </div>
             <button

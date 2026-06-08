@@ -85,7 +85,7 @@ export default function ProfilePage() {
         <section className="zen-glass mb-8 p-7">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <BarChart3 className="h-4 w-4" />
-            Profile
+            Hồ sơ
           </p>
           <h1 className="font-mincho text-4xl">Tiến độ học tập</h1>
           <p className="mt-3 text-sm text-ink/65">{user?.email}</p>

@@ -17,7 +17,15 @@ const TodayReview = lazy(() => import('./pages/TodayReview'));
 function RouteFallback() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
-      <div className="zen-glass px-5 py-4 text-sm font-semibold">Đang tải trang...</div>
+      <div className="zen-glass w-full max-w-md p-5">
+        <div className="mb-4 h-5 w-36 animate-pulse rounded bg-mist" />
+        <div className="grid gap-3">
+          <div className="h-20 animate-pulse rounded bg-mist" />
+          <div className="h-20 animate-pulse rounded bg-mist" />
+          <div className="h-20 animate-pulse rounded bg-mist" />
+        </div>
+        <p className="mt-4 text-sm font-semibold text-ink/60">Đang tải trang...</p>
+      </div>
     </main>
   );
 }

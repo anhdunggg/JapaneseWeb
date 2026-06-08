@@ -40,12 +40,12 @@ function detailForLesson(lesson) {
   return pick(
     lesson,
     ['description', 'summary', 'content', 'notes'],
-    'Practice the lesson material below.',
+    'Luyện tập nội dung của bài học này.',
   );
 }
 
 function formatDate(value) {
-  if (!value) return 'Unknown date';
+  if (!value) return 'Không rõ ngày';
 
   return new Intl.DateTimeFormat('en', {
     dateStyle: 'medium',
@@ -87,28 +87,28 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
         <div>
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <Target className="h-4 w-4" />
-            Progress
+            Tiến độ
           </p>
-          <h2 className="font-mincho text-3xl">Study history</h2>
+          <h2 className="font-mincho text-3xl">Lịch sử học</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-ink/70">
-            Track recent quiz and exercise attempts, then review missed answers.
+            Theo dõi các lượt làm quiz, bài tập và ôn lại câu sai.
           </p>
         </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <article className="rounded bg-washi p-4">
-          <p className="text-sm font-semibold text-ink/65">Latest quiz score</p>
+          <p className="text-sm font-semibold text-ink/65">Điểm quiz gần nhất</p>
           <p className="mt-2 font-mincho text-3xl text-indigo">
             {latestQuiz ? `${latestQuiz.score}/${latestQuiz.total_questions}` : '-'}
           </p>
           <p className="mt-2 text-sm text-ink/65">
-            {latestQuiz ? formatDate(latestQuiz.created_at) : 'No quiz attempts yet.'}
+            {latestQuiz ? formatDate(latestQuiz.created_at) : 'Chưa có lượt làm quiz.'}
           </p>
         </article>
 
         <article className="rounded bg-washi p-4">
-          <p className="text-sm font-semibold text-ink/65">Latest exercise score</p>
+          <p className="text-sm font-semibold text-ink/65">Điểm bài tập gần nhất</p>
           <p className="mt-2 font-mincho text-3xl text-indigo">
             {latestExercise
               ? `${latestExercise.score}/${latestExercise.total_questions}`
@@ -119,14 +119,14 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
               ? `${latestExerciseSource?.title || 'Exercise'} - ${formatDate(
                   latestExercise.created_at,
                 )}`
-              : 'No exercise attempts yet.'}
+              : 'Chưa có lượt làm bài tập.'}
           </p>
         </article>
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <div>
-          <h3 className="mb-3 font-mincho text-2xl">Recent quizzes</h3>
+          <h3 className="mb-3 font-mincho text-2xl">Quiz gần đây</h3>
           <div className="space-y-2">
             {quizAttempts.slice(0, 5).map((attempt) => (
               <div
@@ -141,14 +141,14 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
             ))}
             {quizAttempts.length === 0 ? (
               <p className="rounded bg-white/70 p-4 text-sm text-ink/70">
-                No quiz history yet.
+                Chưa có lịch sử quiz.
               </p>
             ) : null}
           </div>
         </div>
 
         <div>
-          <h3 className="mb-3 font-mincho text-2xl">Recent exercises</h3>
+          <h3 className="mb-3 font-mincho text-2xl">Bài tập gần đây</h3>
           <div className="space-y-2">
             {exerciseAttempts.slice(0, 5).map((attempt) => {
               const exercise = exercises.find((item) => item.id === attempt.exercise_id);
@@ -158,7 +158,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
                   className="flex items-center justify-between gap-3 rounded border border-indigo/10 bg-white/75 px-4 py-3 text-sm"
                 >
                   <span className="truncate text-ink/70">
-                    {exercise?.title || 'Exercise'} - {formatDate(attempt.created_at)}
+                    {exercise?.title || 'Bài tập'} - {formatDate(attempt.created_at)}
                   </span>
                   <span className="font-semibold text-indigo">
                     {attempt.score}/{attempt.total_questions}
@@ -168,7 +168,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
             })}
             {exerciseAttempts.length === 0 ? (
               <p className="rounded bg-white/70 p-4 text-sm text-ink/70">
-                No exercise history yet.
+                Chưa có lịch sử bài tập.
               </p>
             ) : null}
           </div>
@@ -179,13 +179,13 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
         <div className="mt-6 rounded border border-sakura/40 bg-sakura/10 p-4">
           <h3 className="mb-3 flex items-center gap-2 font-mincho text-2xl">
             <XCircle className="h-5 w-5 text-vermilion" />
-            Review mistakes
+            Ôn câu sai
           </h3>
 
           {latestQuiz ? (
             <div className="mb-5">
               <p className="mb-2 text-sm font-semibold text-indigo">
-                Latest quiz mistakes
+                Câu sai trong quiz gần nhất
               </p>
               {quizMistakes.length > 0 ? (
                 <div className="space-y-3">
@@ -195,10 +195,10 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
                         {index + 1}. {question.prompt}
                       </p>
                       <p className="mt-2 text-ink/70">
-                        Your answer: {latestQuiz.answers?.[question.id] || '-'}
+                        Bạn chọn: {latestQuiz.answers?.[question.id] || '-'}
                       </p>
                       <p className="mt-1 text-vermilion">
-                        Correct: {question.answer}
+                        Đáp án: {question.answer}
                       </p>
                     </div>
                   ))}
@@ -206,7 +206,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
               ) : (
                 <p className="flex items-center gap-2 text-sm text-ink/70">
                   <CheckCircle2 className="h-4 w-4 text-vermilion" />
-                  No mistakes in the latest quiz.
+                  Không có câu sai trong quiz gần nhất.
                 </p>
               )}
             </div>
@@ -215,7 +215,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
           {latestExercise ? (
             <div>
               <p className="mb-2 text-sm font-semibold text-indigo">
-                Latest exercise mistakes
+                Câu sai trong bài tập gần nhất
               </p>
               {exerciseMistakes.length > 0 ? (
                 <div className="space-y-3">
@@ -233,10 +233,10 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
                           {index + 1}. {question.prompt}
                         </p>
                         <p className="mt-2 text-ink/70">
-                          Your answer: {latestExercise.answers?.[key] || '-'}
+                          Bạn chọn: {latestExercise.answers?.[key] || '-'}
                         </p>
                         <p className="mt-1 text-vermilion">
-                          Correct: {answerKey[key]}
+                          Đáp án: {answerKey[key]}
                         </p>
                       </div>
                     );
@@ -245,7 +245,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
               ) : (
                 <p className="flex items-center gap-2 text-sm text-ink/70">
                   <CheckCircle2 className="h-4 w-4 text-vermilion" />
-                  No mistakes in the latest exercise.
+                  Không có câu sai trong bài tập gần nhất.
                 </p>
               )}
             </div>
@@ -354,7 +354,7 @@ export default function LessonExercises() {
       <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
         <div className="zen-glass flex items-center gap-3 px-5 py-4">
           <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
-          <span className="text-sm font-medium">Opening exercises...</span>
+          <span className="text-sm font-medium">Đang mở bài tập...</span>
         </div>
       </main>
     );
@@ -382,7 +382,7 @@ export default function LessonExercises() {
         {error ? (
           <div className="flex items-start gap-3 rounded border border-vermilion/20 bg-vermilion/10 p-5 text-sm leading-6">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-vermilion" />
-            <p>Could not load exercises: {error}</p>
+            <p>Không tải được bài tập: {error}</p>
           </div>
         ) : (
           <>

@@ -82,7 +82,7 @@ export default function QuizPanel({
       .eq('lesson_id', lesson.id);
 
     if (error) {
-      setMessage(`Could not load question bank: ${error.message}`);
+      setMessage(`Không tải được ngân hàng câu hỏi: ${error.message}`);
       setLoadingBank(false);
       return;
     }
@@ -117,8 +117,8 @@ export default function QuizPanel({
       const { error } = await supabase.from('question_bank').insert(rows);
       if (error) throw error;
 
-      setMessage(`Added ${rows.length} questions to this lesson bank.`);
-      toast.success(`Added ${rows.length} questions to this lesson bank.`);
+      setMessage(`Đã thêm ${rows.length} câu hỏi vào bài học này.`);
+      toast.success(`Đã thêm ${rows.length} câu hỏi vào bài học này.`);
       await loadQuestionCount();
     } catch (err) {
       setMessage(err.message);
@@ -143,19 +143,19 @@ export default function QuizPanel({
     setCreatingQuiz(false);
 
     if (error) {
-      setMessage(`Could not create quiz: ${error.message}`);
+      setMessage(`Không tạo được quiz: ${error.message}`);
       return;
     }
 
     const bank = data ?? [];
     if (bank.length === 0) {
-      setMessage('No questions are available yet. Ask an admin to generate the question bank first.');
+      setMessage('Chưa có câu hỏi. Quản trị viên cần tạo ngân hàng câu hỏi trước.');
       return;
     }
 
     const selected = shuffle(bank).slice(0, Math.min(QUIZ_SIZE, bank.length));
     setQuiz({
-      title: `${lesson.title || 'Lesson'} Practice`,
+      title: `${lesson.title || 'Bài học'} - Luyện tập`,
       questions: selected.map(normalizeQuestion),
     });
   }
@@ -163,8 +163,8 @@ export default function QuizPanel({
   async function handleSave() {
     if (!quiz) return;
     if (!saveHistory) {
-      setMessage('Admin preview mode: quiz history is not saved.');
-      toast.info('Admin preview mode: quiz history is not saved.');
+      setMessage('Chế độ xem thử của quản trị viên: không lưu lịch sử quiz.');
+      toast.info('Chế độ xem thử của quản trị viên: không lưu lịch sử quiz.');
       return;
     }
 
@@ -183,8 +183,8 @@ export default function QuizPanel({
     setSaving(false);
 
     if (error) {
-      setMessage(`Could not save quiz result: ${error.message}`);
-      toast.error(`Could not save quiz result: ${error.message}`);
+      setMessage(`Không lưu được kết quả quiz: ${error.message}`);
+      toast.error(`Không lưu được kết quả quiz: ${error.message}`);
       return;
     }
 
@@ -198,8 +198,8 @@ export default function QuizPanel({
       completed_at: score === quiz.questions.length ? new Date().toISOString() : null,
     });
 
-    setMessage('Quiz result saved.');
-    toast.success('Quiz result saved.');
+    setMessage('Đã lưu kết quả quiz.');
+    toast.success('Đã lưu kết quả quiz.');
     onAttemptSaved?.();
   }
 
