@@ -8,13 +8,13 @@ import CommandPalette from './CommandPalette';
 
 function navClass({ isActive }) {
   return `inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-semibold transition ${
-    isActive ? 'bg-indigo text-washi shadow-soft' : 'text-indigo hover:bg-white/80'
+    isActive ? 'tab-active' : 'text-indigo hover:bg-white/80'
   }`;
 }
 
 function mobileNavClass({ isActive }) {
   return `flex flex-1 flex-col items-center gap-1 rounded px-2 py-2 text-[11px] font-semibold transition ${
-    isActive ? 'bg-indigo text-washi' : 'text-ink/65'
+    isActive ? 'tab-active' : 'text-ink/65'
   }`;
 }
 
@@ -34,7 +34,7 @@ export default function AppShell() {
       <header className="sticky top-0 z-40 border-b border-indigo/10 bg-washi/82 px-4 py-3 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <NavLink to="/dashboard" className="flex items-center gap-3 text-indigo">
-            <span className="flex h-10 w-10 items-center justify-center rounded bg-indigo font-mincho text-xl text-washi shadow-soft">
+            <span className="flex h-10 w-10 items-center justify-center rounded bg-vermilion font-mincho text-xl text-white shadow-soft">
               日
             </span>
             <span className="hidden sm:block">

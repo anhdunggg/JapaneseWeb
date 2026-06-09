@@ -274,36 +274,36 @@ export default function Dashboard() {
 
         <section className="mb-8 grid gap-5">
           <motion.article
-            className="quest-hero zen-glass p-8 text-washi"
+            className="quest-hero zen-glass p-8 text-indigo"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
           >
-            <div className="absolute -right-10 -top-14 h-52 w-52 rounded-full bg-white/10 blur-2xl" />
-            <div className="absolute -bottom-16 left-10 h-44 w-44 rounded-full bg-vermilion/25 blur-2xl" />
-            <div className="pointer-events-none absolute right-8 top-4 font-mincho text-[9rem] leading-none text-white/10">
+            <div className="absolute -right-10 -top-14 h-52 w-52 rounded-full bg-sakura/20 blur-2xl" />
+            <div className="absolute -bottom-16 left-10 h-44 w-44 rounded-full bg-vermilion/10 blur-2xl" />
+            <div className="pointer-events-none absolute right-8 top-4 font-mincho text-[9rem] leading-none text-indigo/[0.06]">
               学
             </div>
-            <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-sakura">
+            <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-vermilion">
               <Target className="h-4 w-4" />
               Hôm nay
             </p>
             <h2 className="font-mincho text-5xl leading-tight">
               15 phút học tập có mục tiêu
             </h2>
-            <p className="mt-5 max-w-2xl leading-7 text-washi/80">
+            <p className="mt-5 max-w-2xl leading-7 text-ink/70">
               Ôn nhanh lý thuyết, làm một quiz ngắn, sau đó quay lại các câu sai.
               Tập trung vào một bài mỗi lần để giữ nhịp học nhẹ nhưng đều.
             </p>
             {nextLesson ? (
-              <div className="mt-6 rounded border border-white/15 bg-white/10 p-4 backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
+              <div className="mt-6 rounded border border-indigo/10 bg-white/62 p-4 shadow-soft backdrop-blur">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">
                   Tiếp tục học
                 </p>
-                <h3 className="mt-2 truncate font-mincho text-2xl text-washi">
+                <h3 className="mt-2 truncate font-mincho text-2xl text-indigo">
                   {getLessonTitle(nextLesson, 0)}
                 </h3>
-                <p className="mt-2 text-sm text-washi/70">
+                <p className="mt-2 text-sm text-ink/65">
                   {nextLessonProgress?.last_total
                     ? `Điểm gần nhất: ${nextLessonProgress.last_score}/${nextLessonProgress.last_total}`
                     : 'Chưa có điểm gần nhất'}
@@ -312,11 +312,11 @@ export default function Dashboard() {
             ) : null}
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {['Ôn lý thuyết', 'Làm quiz ngắn', 'Sửa câu sai'].map((step, index) => (
-                <div key={step} className="rounded border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
+                <div key={step} className="rounded border border-indigo/10 bg-white/48 px-4 py-3 backdrop-blur">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">
                     Bước {index + 1}
                   </p>
-                  <p className="mt-1 font-semibold text-washi">{step}</p>
+                  <p className="mt-1 font-semibold text-indigo">{step}</p>
                 </div>
               ))}
             </div>
@@ -325,26 +325,26 @@ export default function Dashboard() {
                 <>
                   <Link
                     to={`/lessons/${nextLesson.id}`}
-                    className="zen-shimmer inline-flex items-center gap-2 rounded bg-washi px-5 py-3 text-sm font-semibold text-indigo shadow-soft"
+                    className="zen-shimmer inline-flex items-center gap-2 rounded bg-vermilion px-5 py-3 text-sm font-semibold text-white shadow-soft"
                   >
                     Bắt đầu học
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                   <Link
                     to={`/lessons/${nextLesson.id}/exercises`}
-                    className="inline-flex items-center gap-2 rounded border border-white/25 px-5 py-3 text-sm font-semibold text-washi"
+                    className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/60 px-5 py-3 text-sm font-semibold text-indigo"
                   >
                     Tạo quiz nhanh
                   </Link>
                   <Link
                     to="/review/today"
-                    className="inline-flex items-center gap-2 rounded border border-white/25 px-5 py-3 text-sm font-semibold text-washi"
+                    className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/60 px-5 py-3 text-sm font-semibold text-indigo"
                   >
                     Ôn hôm nay
                   </Link>
                   <Link
                     to="/mistakes"
-                    className="inline-flex items-center gap-2 rounded border border-white/25 px-5 py-3 text-sm font-semibold text-washi"
+                    className="inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/60 px-5 py-3 text-sm font-semibold text-indigo"
                   >
                     Ôn câu sai
                   </Link>
@@ -379,7 +379,7 @@ export default function Dashboard() {
                     <div key={level} className="flex items-center gap-3 rounded border border-indigo/10 bg-washi/70 p-3">
                       <div
                         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-mincho text-base shadow-soft ${
-                          active ? 'bg-indigo text-washi' : 'bg-washi text-indigo'
+                          active ? 'tab-icon-active' : 'bg-washi text-indigo'
                         }`}
                       >
                         {level}

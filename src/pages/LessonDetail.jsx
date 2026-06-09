@@ -413,11 +413,11 @@ export default function LessonDetail() {
                           key={item.label}
                           className={`flex cursor-default items-center gap-4 rounded border p-4 ${
                             active
-                              ? 'border-vermilion/30 bg-sakura/15'
+                              ? 'tab-card-active'
                               : 'border-indigo/10 bg-washi/80'
                           }`}
                         >
-                          <span className={`flex h-11 w-11 items-center justify-center rounded shadow-soft ${active ? 'bg-indigo text-washi' : 'bg-white text-vermilion'}`}>
+                          <span className={`flex h-11 w-11 items-center justify-center rounded shadow-soft ${active ? 'tab-icon-active' : 'bg-white text-vermilion'}`}>
                             <Icon className="h-5 w-5" />
                           </span>
                           <span>
@@ -448,8 +448,8 @@ export default function LessonDetail() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`rounded px-4 py-3 text-sm font-semibold transition ${
                       activeTab === tab.id
-                        ? 'bg-indigo text-washi shadow-soft'
-                        : 'bg-white/75 text-indigo ring-1 ring-indigo/10 hover:ring-sakura'
+                        ? 'tab-active'
+                        : 'tab-idle'
                     }`}
                   >
                     {tab.label}
@@ -671,7 +671,7 @@ export default function LessonDetail() {
                         <>
                           <span
                             className={`flex h-10 w-10 items-center justify-center rounded-full shadow-soft ${
-                              active ? 'bg-indigo text-washi' : 'bg-washi text-vermilion'
+                              active ? 'tab-icon-active' : 'bg-washi text-vermilion'
                             }`}
                           >
                             {step.id === 'quiz' ? <Icon className="h-5 w-5" /> : index + 1}

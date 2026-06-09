@@ -357,7 +357,7 @@ export default function LessonContentManager({
               reset(table);
             }}
             className={`zen-hover rounded px-4 py-2 text-sm font-semibold capitalize ${
-              active === table ? 'bg-indigo text-washi' : 'bg-washi text-indigo'
+              active === table ? 'tab-active' : 'tab-idle'
             }`}
           >
             {table}

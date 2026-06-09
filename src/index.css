@@ -161,9 +161,9 @@ a:focus-visible {
 
   .quest-hero {
     background:
-      radial-gradient(circle at 82% 18%, rgba(255, 183, 197, 0.22), transparent 16rem),
-      radial-gradient(circle at 14% 90%, rgba(230, 126, 34, 0.2), transparent 16rem),
-      linear-gradient(135deg, #243447, #2c3e50 52%, #1f2f3f);
+      radial-gradient(circle at 86% 16%, rgba(255, 183, 197, 0.34), transparent 18rem),
+      radial-gradient(circle at 12% 88%, rgba(230, 126, 34, 0.12), transparent 18rem),
+      linear-gradient(135deg, #fffaf3 0%, #fdf0f2 52%, #f3f6fb 100%);
   }
 
   .quest-map {
@@ -192,6 +192,22 @@ a:focus-visible {
 
   .skeleton-line {
     @apply animate-pulse rounded bg-mist;
+  }
+
+  .tab-active {
+    @apply bg-white/90 text-indigo shadow-soft ring-1 ring-vermilion/20;
+  }
+
+  .tab-idle {
+    @apply bg-white/75 text-indigo ring-1 ring-indigo/10 hover:ring-sakura;
+  }
+
+  .tab-card-active {
+    @apply border-vermilion/30 bg-sakura/20 shadow-soft;
+  }
+
+  .tab-icon-active {
+    @apply bg-vermilion text-white;
   }
 
 }
@@ -248,6 +264,48 @@ body.theme-night .bg-sakura\/20,
 body.theme-night .bg-sakura\/25,
 body.theme-night .bg-vermilion\/10 {
   background-color: rgba(255, 183, 197, 0.16) !important;
+}
+
+body.theme-night .tab-active {
+  background:
+    linear-gradient(135deg, rgba(253, 251, 247, 0.1), rgba(255, 183, 197, 0.1)) !important;
+  color: #fdfbf7 !important;
+  border-color: rgba(255, 183, 197, 0.24) !important;
+  --tw-ring-color: rgba(255, 183, 197, 0.28) !important;
+}
+
+body.theme-night .tab-idle {
+  background-color: rgba(23, 37, 52, 0.62) !important;
+  color: rgba(253, 251, 247, 0.78) !important;
+  --tw-ring-color: rgba(253, 251, 247, 0.12) !important;
+}
+
+body.theme-night .tab-card-active {
+  background:
+    linear-gradient(135deg, rgba(230, 126, 34, 0.18), rgba(255, 183, 197, 0.08)) !important;
+  border-color: rgba(255, 183, 197, 0.28) !important;
+}
+
+body.theme-night .tab-icon-active {
+  background-color: #e67e22 !important;
+  color: #101923 !important;
+}
+
+body.theme-night .quest-hero {
+  background:
+    radial-gradient(circle at 84% 18%, rgba(255, 183, 197, 0.12), transparent 17rem),
+    radial-gradient(circle at 14% 88%, rgba(230, 126, 34, 0.12), transparent 17rem),
+    linear-gradient(135deg, #162233 0%, #1d2b3d 52%, #2a2438 100%) !important;
+}
+
+body.theme-night .quest-hero .bg-white\/48,
+body.theme-night .quest-hero .bg-white\/60,
+body.theme-night .quest-hero .bg-white\/62 {
+  background-color: rgba(253, 251, 247, 0.08) !important;
+}
+
+body.theme-night .quest-hero .text-white {
+  color: #fdfbf7 !important;
 }
 
 body.theme-night .hover\:bg-white:hover,

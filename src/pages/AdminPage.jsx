@@ -415,8 +415,8 @@ export default function AdminPage() {
                           onClick={() => setActivePanel(tab.id)}
                           className={`inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold ${
                             activePanel === tab.id
-                              ? 'bg-indigo text-washi'
-                              : 'bg-washi text-indigo'
+                              ? 'tab-active'
+                              : 'tab-idle'
                           }`}
                         >
                           <Icon className="h-4 w-4" />

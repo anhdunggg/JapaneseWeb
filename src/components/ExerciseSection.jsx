@@ -201,8 +201,8 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
               onClick={() => setActiveType(tab.id)}
               className={`rounded px-4 py-2.5 text-sm font-semibold transition ${
                 activeType === tab.id
-                  ? 'bg-indigo text-washi shadow-soft'
-                  : 'bg-white/80 text-indigo ring-1 ring-indigo/10 hover:ring-sakura'
+                  ? 'tab-active'
+                  : 'tab-idle'
               }`}
             >
               {tab.label}

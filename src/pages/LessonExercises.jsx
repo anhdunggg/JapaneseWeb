@@ -419,8 +419,8 @@ export default function LessonExercises() {
                     onClick={() => setActiveMode(mode.id)}
                     className={`rounded px-4 py-3 text-sm font-semibold transition ${
                       activeMode === mode.id
-                        ? 'bg-indigo text-washi shadow-soft'
-                        : 'bg-washi text-indigo hover:ring-1 hover:ring-sakura'
+                        ? 'tab-active'
+                        : 'tab-idle'
                     }`}
                   >
                     {mode.label}
