@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, LoaderCircle, RotateCcw } from 'lucide-react';
+import { ArrowRight, CheckCircle2, LoaderCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -17,6 +17,20 @@ function meaningForCard(card) {
 
 function imagePositionFor(item) {
   return `${Number(item?.image_position_x ?? 50)}% ${Number(item?.image_position_y ?? 50)}%`;
+}
+
+function KanjiTile({ character }) {
+  return (
+    <div className="relative mx-auto h-64 w-full max-w-xl overflow-hidden rounded bg-gradient-to-br from-washi via-sakura/20 to-vermilion/20 ring-1 ring-indigo/10">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.85),transparent_30%),radial-gradient(circle_at_82%_76%,rgba(44,62,80,0.12),transparent_32%)]" />
+      <div className="absolute -right-8 -top-12 font-mincho text-[12rem] leading-none text-indigo/[0.04]">
+        {character}
+      </div>
+      <div className="relative flex h-full items-center justify-center">
+        <span className="font-mincho text-9xl leading-none text-indigo drop-shadow-sm">{character}</span>
+      </div>
+    </div>
+  );
 }
 
 export default function StudySession() {
@@ -92,11 +106,6 @@ export default function StudySession() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-3xl">
-        <Link to={`/lessons/${lessonId}`} className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
-          <ArrowLeft className="h-4 w-4" />
-          Về lesson
-        </Link>
-
         <section className="zen-glass mb-6 p-6">
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">Phiên học</p>
           <h1 className="mt-2 font-mincho text-4xl">{lesson?.title || 'Lesson'}</h1>
@@ -121,7 +130,9 @@ export default function StudySession() {
             }
             transition={{ duration: 0.24 }}
           >
-            {card.image_url ? (
+            {card.item_type === 'kanji' ? (
+              <KanjiTile character={labelForCard(card)} />
+            ) : card.image_url ? (
               <img
                 src={card.image_url}
                 alt={labelForCard(card)}

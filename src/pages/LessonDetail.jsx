@@ -3,7 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   AlertCircle,
-  ArrowLeft,
   ArrowRight,
   BookOpenText,
   Brain,
@@ -85,6 +84,26 @@ function StudyImage({ src, alt, compact = false, positionX = 50, positionY = 50 
       className={`rounded object-cover ring-1 ring-indigo/5 ${compact ? 'h-20 w-20' : 'h-40 w-full'}`}
       style={{ objectPosition: `${Number(positionX ?? 50)}% ${Number(positionY ?? 50)}%` }}
     />
+  );
+}
+
+function KanjiTile({ character, compact = false }) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded bg-gradient-to-br from-washi via-sakura/20 to-vermilion/20 ring-1 ring-indigo/5 ${
+        compact ? 'h-20 w-20' : 'h-44 w-full'
+      }`}
+    >
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.85),transparent_30%),radial-gradient(circle_at_82%_76%,rgba(44,62,80,0.12),transparent_32%)]" />
+      <div className="absolute -right-5 -top-8 font-mincho text-[8rem] leading-none text-indigo/[0.04]">
+        {character}
+      </div>
+      <div className="relative flex h-full items-center justify-center">
+        <span className={`font-mincho leading-none text-indigo drop-shadow-sm ${compact ? 'text-5xl' : 'text-8xl'}`}>
+          {character}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -231,14 +250,6 @@ export default function LessonDetail() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <Link
-          to="/dashboard"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Về danh sách bài
-        </Link>
-
         {error ? (
           <div className="flex items-start gap-3 rounded border border-vermilion/20 bg-vermilion/10 p-5 text-sm leading-6">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-vermilion" />
@@ -265,133 +276,44 @@ export default function LessonDetail() {
                   <Sparkles className="h-7 w-7 text-vermilion" />
                 </div>
               </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  to={`/lessons/${lessonId}/exercises`}
-                  className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft transition hover:bg-indigo/95"
-                >
-                  Luyện tập
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                {isAdmin ? (
-                  <Link
-                    to="/admin"
-                    className="zen-hover inline-flex items-center gap-2 rounded border border-indigo/10 bg-white/75 px-5 py-3 text-sm font-semibold text-indigo shadow-soft transition hover:border-sakura"
-                  >
-                    <Settings className="h-4 w-4" />
-                    Quản trị nội dung
-                  </Link>
-                ) : null}
-              </div>
             </motion.section>
 
-            <motion.section
-              className="zen-glass mb-8 overflow-hidden p-4"
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.08, duration: 0.38, ease: 'easeOut' }}
-            >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="grid flex-1 gap-3 sm:grid-cols-3">
-                  {[
-                    { label: 'Từ vựng', value: vocabulary.length, icon: Languages, tab: 'vocabulary' },
-                    { label: 'Ngữ pháp', value: grammar.length, icon: Brain, tab: 'grammar' },
-                    { label: 'Kanji', value: kanji.length, icon: BookOpenText, tab: 'kanji' },
-                  ].map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <button
-                        key={item.label}
-                        type="button"
-                        onClick={() => setActiveTab(item.tab)}
-                        className="zen-hover flex items-center gap-4 rounded border border-indigo/10 bg-washi/80 p-4 text-left transition hover:border-sakura"
-                      >
-                        <span className="flex h-11 w-11 items-center justify-center rounded bg-white text-vermilion shadow-soft">
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        <span>
-                          <span className="block font-mincho text-3xl leading-none text-indigo">{item.value}</span>
-                          <span className="mt-1 block text-sm font-semibold text-ink/65">{item.label}</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <Link
-                  to={`/lessons/${lessonId}/exercises`}
-                  className="zen-shimmer inline-flex items-center justify-center gap-3 rounded bg-indigo px-5 py-4 text-sm font-semibold text-washi shadow-soft"
+            <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+              <div>
+                <motion.section
+                  className="zen-glass mb-8 overflow-hidden p-4"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08, duration: 0.38, ease: 'easeOut' }}
                 >
-                  <CheckCircle2 className="h-5 w-5 text-sakura" />
-                  Luyện ngay
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </motion.section>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    {[
+                      { label: 'Từ vựng', value: vocabulary.length, icon: Languages, tab: 'vocabulary' },
+                      { label: 'Ngữ pháp', value: grammar.length, icon: Brain, tab: 'grammar' },
+                      { label: 'Kanji', value: kanji.length, icon: BookOpenText, tab: 'kanji' },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => setActiveTab(item.tab)}
+                          className="zen-hover flex items-center gap-4 rounded border border-indigo/10 bg-washi/80 p-4 text-left transition hover:border-sakura"
+                        >
+                          <span className="flex h-11 w-11 items-center justify-center rounded bg-white text-vermilion shadow-soft">
+                            <Icon className="h-5 w-5" />
+                          </span>
+                          <span>
+                            <span className="block font-mincho text-3xl leading-none text-indigo">{item.value}</span>
+                            <span className="mt-1 block text-sm font-semibold text-ink/65">{item.label}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.section>
 
-            <section className="zen-glass mb-8 p-5">
-              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-                    Study mode
-                  </p>
-                  <h2 className="mt-1 font-mincho text-3xl text-indigo">Học theo từng bước</h2>
-                </div>
-                <p className="text-sm text-ink/65">Đi theo flow này để học gọn hơn, không bị lạc giữa nhiều tab.</p>
-              </div>
-              <div className="grid gap-3 md:grid-cols-4">
-                {studySteps.map((step, index) => {
-                  const Icon = step.icon;
-                  const active = activeTab === step.id;
-                  const content = (
-                    <>
-                      <span
-                        className={`flex h-10 w-10 items-center justify-center rounded-full shadow-soft ${
-                          active ? 'bg-indigo text-washi' : 'bg-white text-vermilion'
-                        }`}
-                      >
-                        {step.id === 'quiz' ? <Icon className="h-5 w-5" /> : index + 1}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block font-semibold">{step.label}</span>
-                        <span className="block text-xs text-ink/60">{step.detail}</span>
-                      </span>
-                    </>
-                  );
-
-                  return step.id === 'quiz' ? (
-                  <Link
-                    key={step.id}
-                    to={`/lessons/${lessonId}/exercises`}
-                      className="zen-hover flex items-center gap-3 rounded border border-indigo/10 bg-washi p-4 text-indigo"
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <button
-                      key={step.id}
-                      type="button"
-                      onClick={() => setActiveTab(step.id)}
-                      className={`zen-hover flex items-center gap-3 rounded border p-4 text-left ${
-                        active
-                          ? 'border-vermilion/30 bg-sakura/20 text-indigo'
-                          : 'border-indigo/10 bg-washi text-indigo'
-                      }`}
-                    >
-                      {content}
-                    </button>
-                  );
-                })}
-              </div>
-              <Link
-                to={`/lessons/${lessonId}/study`}
-                className="zen-shimmer mt-4 inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft"
-              >
-                Bắt đầu study session
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </section>
-
-            <section>
+                <section>
               <div className="mb-6 flex flex-wrap gap-2">
                 {[
                   { id: 'vocabulary', label: 'Từ vựng', count: vocabulary.length },
@@ -540,7 +462,7 @@ export default function LessonDetail() {
                     <span className="text-sm font-semibold text-ink/60">{kanji.length} chữ</span>
                   </div>
                   {kanji.length === 0 ? <EmptySection label="kanji" /> : null}
-                  <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="grid gap-5 sm:grid-cols-2">
                     {kanji.map((item) => {
                       const character = pick(item, ['character', 'kanji', 'symbol'], 'Kanji');
                       const revealed = revealedCards[`kanji:${item.id}`];
@@ -553,16 +475,8 @@ export default function LessonDetail() {
                           viewport={{ once: true, margin: '-30px' }}
                           transition={{ duration: 0.32 }}
                         >
-                          <div className="relative bg-gradient-to-br from-indigo via-indigo to-vermilion p-4 text-washi">
-                            <div className="absolute right-3 top-2 font-mincho text-7xl leading-none text-white/10">
-                              {character}
-                            </div>
-                            <StudyImage
-                              src={item.image_url}
-                              alt={character}
-                              positionX={item.image_position_x}
-                              positionY={item.image_position_y}
-                            />
+                          <div className="p-4">
+                            <KanjiTile character={character} />
                           </div>
                           <div className="p-5">
                             <p className="font-mincho text-6xl leading-none text-indigo">{character}</p>
@@ -614,7 +528,91 @@ export default function LessonDetail() {
                   </div>
                 </div>
               ) : null}
-            </section>
+                </section>
+              </div>
+
+              <aside className="xl:sticky xl:top-24 xl:self-start">
+                <div className="zen-glass p-5">
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                    Bảng điều khiển
+                  </p>
+                  <h2 className="mt-2 font-mincho text-3xl text-indigo">Học bài này</h2>
+                  <p className="mt-3 text-sm leading-6 text-ink/65">
+                    Chọn phần cần học hoặc bắt đầu phiên học từng thẻ để tập trung hơn.
+                  </p>
+
+                  <div className="mt-5 grid gap-2">
+                    {studySteps.map((step, index) => {
+                      const Icon = step.icon;
+                      const active = activeTab === step.id;
+                      const content = (
+                        <>
+                          <span
+                            className={`flex h-10 w-10 items-center justify-center rounded-full shadow-soft ${
+                              active ? 'bg-indigo text-washi' : 'bg-washi text-vermilion'
+                            }`}
+                          >
+                            {step.id === 'quiz' ? <Icon className="h-5 w-5" /> : index + 1}
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block font-semibold">{step.label}</span>
+                            <span className="block text-xs text-ink/60">{step.detail}</span>
+                          </span>
+                        </>
+                      );
+
+                      return step.id === 'quiz' ? (
+                        <Link
+                          key={step.id}
+                          to={`/lessons/${lessonId}/exercises`}
+                          className="zen-hover flex items-center gap-3 rounded border border-indigo/10 bg-washi p-3 text-indigo"
+                        >
+                          {content}
+                        </Link>
+                      ) : (
+                        <button
+                          key={step.id}
+                          type="button"
+                          onClick={() => setActiveTab(step.id)}
+                          className={`zen-hover flex items-center gap-3 rounded border p-3 text-left ${
+                            active
+                              ? 'border-vermilion/30 bg-sakura/20 text-indigo'
+                              : 'border-indigo/10 bg-washi text-indigo'
+                          }`}
+                        >
+                          {content}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-5 grid gap-2">
+                    <Link
+                      to={`/lessons/${lessonId}/study`}
+                      className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-4 py-3 text-sm font-semibold text-washi shadow-soft"
+                    >
+                      Bắt đầu phiên học
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      to={`/lessons/${lessonId}/exercises`}
+                      className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft"
+                    >
+                      Làm bài tập
+                    </Link>
+                    {isAdmin ? (
+                      <Link
+                        to="/admin"
+                        className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-4 py-3 text-sm font-semibold text-indigo shadow-soft"
+                      >
+                        <Settings className="h-4 w-4" />
+                        Quản trị nội dung
+                      </Link>
+                    ) : null}
+                  </div>
+                </div>
+              </aside>
+            </div>
           </>
         )}
       </div>

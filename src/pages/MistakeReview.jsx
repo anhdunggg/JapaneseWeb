@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, LoaderCircle, XCircle } from 'lucide-react';
+import { AlertCircle, LoaderCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 
@@ -140,14 +140,6 @@ export default function MistakeReview() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <Link
-          to="/dashboard"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Về trang học
-        </Link>
-
         <section className="zen-glass mb-8 p-7">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <XCircle className="h-4 w-4" />

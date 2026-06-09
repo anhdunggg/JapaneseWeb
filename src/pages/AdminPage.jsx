@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   AlertCircle,
-  ArrowLeft,
   BookOpenText,
   Image,
   Layers3,
@@ -230,13 +229,6 @@ export default function AdminPage() {
       <div className="mx-auto max-w-7xl">
         <header className="mb-8 flex flex-col gap-4 border-b border-indigo/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <Link
-              to="/dashboard"
-              className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Về trang học
-            </Link>
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
               Quản trị
             </p>

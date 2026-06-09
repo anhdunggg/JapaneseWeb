@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertCircle, ArrowLeft, ImageOff, LoaderCircle, RefreshCw, Save } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { AlertCircle, ImageOff, LoaderCircle, RefreshCw, Save } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { isPlaceholderImage } from '../lib/imageUtils';
@@ -60,11 +59,6 @@ export default function ImageReview() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
-          <ArrowLeft className="h-4 w-4" />
-          Về trang chủ
-        </Link>
-
         {!isAdmin ? (
           <section className="zen-glass p-7">
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">

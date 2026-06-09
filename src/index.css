@@ -208,6 +208,42 @@ body.theme-night textarea {
   color: #fdfbf7;
 }
 
+body.theme-night input::placeholder,
+body.theme-night textarea::placeholder {
+  color: rgba(253, 251, 247, 0.48);
+}
+
+body.theme-night .border-indigo\/10,
+body.theme-night .ring-indigo\/10,
+body.theme-night .ring-indigo\/5 {
+  border-color: rgba(253, 251, 247, 0.13) !important;
+  --tw-ring-color: rgba(253, 251, 247, 0.13) !important;
+}
+
+body.theme-night .text-ink\/35,
+body.theme-night .text-ink\/40,
+body.theme-night .text-ink\/50,
+body.theme-night .text-ink\/55,
+body.theme-night .text-ink\/60 {
+  color: rgba(253, 251, 247, 0.58) !important;
+}
+
+body.theme-night .bg-sakura\/20,
+body.theme-night .bg-sakura\/25,
+body.theme-night .bg-vermilion\/10 {
+  background-color: rgba(255, 183, 197, 0.16) !important;
+}
+
+body.theme-night .hover\:bg-white:hover,
+body.theme-night .hover\:bg-white\/80:hover {
+  background-color: rgba(253, 251, 247, 0.1) !important;
+}
+
+body.theme-night .shadow-zen,
+body.theme-night .shadow-soft {
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24) !important;
+}
+
 body.theme-night nav[aria-label="Breadcrumb"] {
   color: rgba(253, 251, 247, 0.72);
 }

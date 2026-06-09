@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, BookOpenText, Brain, Languages, LoaderCircle, Search } from 'lucide-react';
+import { AlertCircle, BookOpenText, Brain, Languages, LoaderCircle, Search } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 function includes(value, query) {
@@ -115,11 +115,6 @@ export default function SearchPage() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <Link to="/dashboard" className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion">
-          <ArrowLeft className="h-4 w-4" />
-          Về dashboard
-        </Link>
-
         <section className="zen-glass mb-6 p-7">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
             <Search className="h-4 w-4" />

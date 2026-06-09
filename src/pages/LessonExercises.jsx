@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   AlertCircle,
-  ArrowLeft,
   BookOpenText,
   CheckCircle2,
   LoaderCircle,
@@ -363,22 +362,6 @@ export default function LessonExercises() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex flex-wrap gap-3">
-          <Link
-            to={`/lessons/${lessonId}`}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Về lý thuyết
-          </Link>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-ink/65 transition hover:text-indigo"
-          >
-            Về danh sách bài
-          </Link>
-        </div>
-
         {error ? (
           <div className="flex items-start gap-3 rounded border border-vermilion/20 bg-vermilion/10 p-5 text-sm leading-6">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-vermilion" />

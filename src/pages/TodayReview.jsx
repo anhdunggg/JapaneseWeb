@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowLeft, CheckCircle2, Flame, LoaderCircle, RotateCcw } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Flame, LoaderCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -19,6 +18,17 @@ function subLabelForItem(item) {
     return [item.meaning, item.onyomi, item.kunyomi].filter(Boolean).join(' · ');
   }
   return [item.meaning, item.furigana, item.romaji].filter(Boolean).join(' · ');
+}
+
+function KanjiTile({ character }) {
+  return (
+    <div className="relative flex h-40 items-center justify-center overflow-hidden rounded bg-gradient-to-br from-washi via-sakura/20 to-vermilion/20 ring-1 ring-indigo/10">
+      <div className="absolute -right-4 -top-7 font-mincho text-8xl leading-none text-indigo/[0.04]">
+        {character}
+      </div>
+      <span className="relative font-mincho text-7xl leading-none text-indigo drop-shadow-sm">{character}</span>
+    </div>
+  );
 }
 
 export default function TodayReview() {
@@ -136,14 +146,6 @@ export default function TodayReview() {
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <Link
-          to="/dashboard"
-          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-vermilion transition hover:text-indigo"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Về dashboard
-        </Link>
-
         <section className="quest-hero zen-glass mb-8 p-7 text-washi">
           <p className="mb-2 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-sakura">
             <Flame className="h-4 w-4" />
@@ -173,7 +175,9 @@ export default function TodayReview() {
               const isRevealed = revealed[key];
               return (
                 <article key={key} className="zen-glass zen-hover p-5">
-                  {item.image_url ? (
+                  {item.item_type === 'kanji' ? (
+                    <KanjiTile character={labelForItem(item)} />
+                  ) : item.image_url ? (
                     <img
                       src={item.image_url}
                       alt={labelForItem(item)}
