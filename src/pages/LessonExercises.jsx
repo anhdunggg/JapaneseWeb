@@ -46,7 +46,7 @@ function detailForLesson(lesson) {
 function formatDate(value) {
   if (!value) return 'Không rõ ngày';
 
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat('vi-VN', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value));
@@ -204,7 +204,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
                 </div>
               ) : (
                 <p className="flex items-center gap-2 text-sm text-ink/70">
-                  <CheckCircle2 className="h-4 w-4 text-vermilion" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   Không có câu sai trong quiz gần nhất.
                 </p>
               )}
@@ -243,7 +243,7 @@ function ProgressPanel({ quizAttempts, exerciseAttempts, exercises }) {
                 </div>
               ) : (
                 <p className="flex items-center gap-2 text-sm text-ink/70">
-                  <CheckCircle2 className="h-4 w-4 text-vermilion" />
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                   Không có câu sai trong bài tập gần nhất.
                 </p>
               )}

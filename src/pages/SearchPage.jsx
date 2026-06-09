@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, BookOpenText, Brain, Languages, Search } from 'lucide-react';
+import { AlertCircle, BookOpenText, Brain, Languages, Pen, Search } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 function includes(value, query) {
@@ -135,7 +135,7 @@ export default function SearchPage() {
       .map((item) => ({
         id: `kanji:${item.id}`,
         type: 'Kanji',
-        icon: BookOpenText,
+        icon: Pen,
         title: item.character || 'Kanji',
         detail: [item.meaning, item.onyomi, item.kunyomi].filter(Boolean).join(' · '),
         href: `/lessons/${item.lesson_id}`,
@@ -188,7 +188,31 @@ export default function SearchPage() {
         ) : null}
 
         {!loading && query.trim() && results.length === 0 ? (
-          <div className="zen-glass p-5 text-sm text-ink/70">Không tìm thấy nội dung phù hợp.</div>
+          <div className="zen-glass p-8 text-center">
+            <Search className="mx-auto h-10 w-10 text-indigo/20" />
+            <p className="mt-4 font-mincho text-2xl text-indigo">Không tìm thấy kết quả</p>
+            <p className="mt-2 text-sm text-ink/60">Thử tìm với từ khóa khác.</p>
+          </div>
+        ) : null}
+
+        {!loading && !query.trim() ? (
+          <div className="zen-glass p-8 text-center">
+            <div className="pointer-events-none font-mincho text-7xl leading-none text-indigo/10">あ</div>
+            <p className="mt-4 font-semibold text-indigo">Nhập từ khóa để tìm kiếm</p>
+            <p className="mt-2 text-sm text-ink/55">Gợi ý: <span className="font-semibold text-indigo">あ</span>, <span className="font-semibold text-indigo">N5</span>, <span className="font-semibold text-indigo">こんにちは</span>, <span className="font-semibold text-indigo">xin chào</span></p>
+            <div className="mx-auto mt-5 flex flex-wrap justify-center gap-2">
+              {['あ', 'N5', 'こんにちは', '勉強', 'kanji'].map((hint) => (
+                <button
+                  key={hint}
+                  type="button"
+                  onClick={() => setQuery(hint)}
+                  className="zen-hover rounded border border-indigo/10 bg-washi px-3 py-1.5 font-mincho text-sm text-indigo"
+                >
+                  {hint}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : null}
 
         <div className="space-y-6">

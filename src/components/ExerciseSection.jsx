@@ -60,12 +60,14 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
     [exercises],
   );
 
+  const typeLabels = { all: 'Tất cả', reading: 'Đọc hiểu', listening: 'Nghe hiểu', practice: 'Luyện tập' };
+
   const typeTabs = useMemo(
     () => [
-      { id: 'all', label: 'All', count: exercises.length },
-      { id: 'reading', label: 'Reading', count: grouped.reading?.length || 0 },
-      { id: 'listening', label: 'Listening', count: grouped.listening?.length || 0 },
-      { id: 'practice', label: 'Practice', count: grouped.practice?.length || 0 },
+      { id: 'all', label: 'Tất cả', count: exercises.length },
+      { id: 'reading', label: 'Đọc hiểu', count: grouped.reading?.length || 0 },
+      { id: 'listening', label: 'Nghe hiểu', count: grouped.listening?.length || 0 },
+      { id: 'practice', label: 'Luyện tập', count: grouped.practice?.length || 0 },
     ],
     [exercises.length, grouped],
   );
@@ -234,7 +236,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                   </div>
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
-                      {exercise.type}
+                      {typeLabels[exercise.type] || exercise.type}
                     </p>
                     <h3 className="mt-1 font-mincho text-2xl">{exercise.title}</h3>
                     {exercise.instructions ? (
@@ -263,7 +265,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                         onClick={() => replayAudio(exercise)}
                         className="rounded bg-white px-3 py-1.5 text-xs font-semibold text-vermilion"
                       >
-                        Replay
+                        Phát lại
                       </button>
                     </div>
                     {exercise.audio_url ? (
@@ -347,7 +349,7 @@ export default function ExerciseSection({ exercises, saveHistory = true, onAttem
                           <p className="font-semibold text-indigo">
                             {index + 1}. {question.prompt}
                           </p>
-                          {checked && isCorrect ? <CheckCircle2 className="h-5 w-5 text-vermilion" /> : null}
+                          {checked && isCorrect ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : null}
                         </div>
 
                         {Array.isArray(question.choices) && question.choices.length > 0 ? (

@@ -113,12 +113,12 @@ function ExamplesList({ examples, mode = 'sentence' }) {
   return (
     <div className="mt-4 space-y-2 border-t border-indigo/10 pt-4">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
-        Examples
+        Ví dụ
       </p>
       {normalized.map((example, index) => (
         <div key={`${mode}-${index}`} className="rounded bg-washi p-3">
           <p className="font-mincho text-lg text-indigo">
-            {example.japanese || example.word || example.term || 'Example'}
+            {example.japanese || example.word || example.term || 'Ví dụ'}
           </p>
           <p className="mt-1 text-sm leading-6 text-ink/75">
             {example.vietnamese || example.meaning || example.english || ''}
@@ -407,21 +407,29 @@ export default function LessonDetail() {
                       { label: 'Kanji', value: kanji.length, icon: BookOpenText, tab: 'kanji' },
                     ].map((item) => {
                       const Icon = item.icon;
+                      const active = activeTab === item.tab;
                       return (
-                        <button
+                        <div
                           key={item.label}
-                          type="button"
-                          onClick={() => setActiveTab(item.tab)}
-                          className="zen-hover flex items-center gap-4 rounded border border-indigo/10 bg-washi/80 p-4 text-left transition hover:border-sakura"
+                          className={`flex cursor-default items-center gap-4 rounded border p-4 ${
+                            active
+                              ? 'border-vermilion/30 bg-sakura/15'
+                              : 'border-indigo/10 bg-washi/80'
+                          }`}
                         >
-                          <span className="flex h-11 w-11 items-center justify-center rounded bg-white text-vermilion shadow-soft">
+                          <span className={`flex h-11 w-11 items-center justify-center rounded shadow-soft ${active ? 'bg-indigo text-washi' : 'bg-white text-vermilion'}`}>
                             <Icon className="h-5 w-5" />
                           </span>
                           <span>
                             <span className="block font-mincho text-3xl leading-none text-indigo">{item.value}</span>
                             <span className="mt-1 block text-sm font-semibold text-ink/65">{item.label}</span>
+                            {active && (
+                              <span className="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-vermilion">
+                                Đang xem
+                              </span>
+                            )}
                           </span>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>

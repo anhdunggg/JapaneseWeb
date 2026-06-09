@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { BookOpenText, Home, Moon, Search, Shield, Sun, Target, Trophy } from 'lucide-react';
+import { Command, Home, Moon, Search, Shield, Sun, Target, Trophy } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Breadcrumbs from './Breadcrumbs';
 import CommandPalette from './CommandPalette';
@@ -71,18 +71,26 @@ export default function AppShell() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {/* Command Palette — hiện trên mọi màn hình */}
             <button
               type="button"
               onClick={() => setCommandSignal((current) => current + 1)}
-              className="hidden rounded border border-indigo/10 bg-white/80 px-3 py-2 text-xs font-semibold text-ink/65 shadow-soft lg:inline-flex"
+              aria-label="Mở tìm nhanh (Ctrl K)"
+              className="zen-hover inline-flex h-10 w-10 items-center justify-center rounded border border-indigo/10 bg-white/80 text-indigo shadow-soft"
             >
-              Ctrl K
+              <Command className="h-4 w-4" />
             </button>
+
+            {/* Ctrl K label — chỉ hiện desktop */}
+            <kbd className="hidden rounded border border-indigo/10 bg-white/80 px-2 py-1.5 text-xs font-semibold text-ink/55 shadow-soft lg:inline-flex">
+              ⌘K
+            </kbd>
+
             <button
               type="button"
               onClick={() => setNightMode((current) => !current)}
               className="zen-hover inline-flex h-10 w-10 items-center justify-center rounded border border-indigo/10 bg-white/80 text-indigo shadow-soft"
-              aria-label="Toggle dark mode"
+              aria-label="Đổi giao diện sáng/tối"
             >
               {nightMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -110,6 +118,7 @@ export default function AppShell() {
         <Outlet />
       </motion.div>
 
+      {/* Mobile bottom nav — 4 tab gọn, không có Command (đã lên header) */}
       <nav className="fixed inset-x-3 bottom-3 z-50 flex gap-1 rounded bg-white/90 p-2 shadow-zen ring-1 ring-indigo/10 backdrop-blur md:hidden">
         <NavLink to="/dashboard" className={mobileNavClass}>
           <Home className="h-4 w-4" />
@@ -124,7 +133,7 @@ export default function AppShell() {
           Ôn tập
         </NavLink>
         <NavLink to="/profile" className={mobileNavClass}>
-          <BookOpenText className="h-4 w-4" />
+          <Trophy className="h-4 w-4" />
           Hồ sơ
         </NavLink>
       </nav>

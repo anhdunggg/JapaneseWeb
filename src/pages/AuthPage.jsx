@@ -13,19 +13,19 @@ function getAuthMessage(error) {
   if (!error) return "";
 
   if (error.message === "Invalid login credentials") {
-    return "The email or password you entered is incorrect.";
+    return "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại.";
   }
 
   if (error.message.includes("Email not confirmed")) {
-    return "Please confirm your email address before signing in.";
+    return "Vui lòng xác nhận địa chỉ email trước khi đăng nhập.";
   }
 
   if (error.message.includes("User already registered")) {
-    return "An account with this email already exists. Please sign in instead.";
+    return "Tài khoản với email này đã tồn tại. Vui lòng đăng nhập thay vào đó.";
   }
 
   if (error.message.includes("Password should be at least")) {
-    return "Your password is too short. Please use at least 6 characters.";
+    return "Mật khẩu quá ngắn. Vui lòng dùng ít nhất 6 ký tự.";
   }
 
   return error.message;
@@ -71,7 +71,7 @@ export default function AuthPage() {
 
     if (isRegistering && !data.session) {
       setMessage(
-        "Account created. Please check your email and confirm your address before signing in.",
+        "Tài khoản đã được tạo. Vui lòng kiểm tra email và xác nhận địa chỉ trước khi đăng nhập.",
       );
       setMode("login");
       setPassword("");
@@ -93,11 +93,11 @@ export default function AuthPage() {
               <span className="font-mincho text-xl">Mochi</span>
             </div>
             <p className="relative mb-5 font-mincho text-5xl leading-tight sm:text-6xl">
-              Build your Japanese study space
+              Không gian học tiếng Nhật của bạn
             </p>
             <p className="relative max-w-xl text-base leading-8 text-ink/80 sm:text-lg">
-              A calm place to collect lessons, track Japanese study progress,
-              and prepare focused practice from your own material.
+              Nơi yên tĩnh để tổ chức bài học, theo dõi tiến độ và
+              luyện tập tập trung từ tài liệu của chính bạn.
             </p>
           </div>
 
@@ -105,12 +105,12 @@ export default function AuthPage() {
             <div className="mb-8 flex items-center justify-between gap-4">
               <div>
                 <h1 className="font-mincho text-3xl text-indigo">
-                  {isRegistering ? "Begin your journey" : "Welcome back"}
+                  {isRegistering ? "Bắt đầu hành trình" : "Chào mừng trở lại"}
                 </h1>
                 <p className="mt-2 text-sm text-ink/70">
                   {isRegistering
-                    ? "Create a quiet space for your Japanese practice."
-                    : "Sign in to continue your study rhythm."}
+                    ? "Tạo không gian học tiếng Nhật của riêng bạn."
+                    : "Đăng nhập để tiếp tục nhịp học của bạn."}
                 </p>
               </div>
               <BookOpenText className="h-9 w-9 text-vermilion" />
@@ -128,7 +128,7 @@ export default function AuthPage() {
                     type="email"
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
-                    placeholder="you@example.com"
+                    placeholder="ban@example.com"
                     autoComplete="email"
                     required
                   />
@@ -137,7 +137,7 @@ export default function AuthPage() {
 
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-ink">
-                  Password
+                  Mật khẩu
                 </span>
                 <span className="flex items-center gap-3 rounded border border-indigo/10 bg-washi px-4 py-3 transition focus-within:border-sakura">
                   <LockKeyhole className="h-5 w-5 text-vermilion" />
@@ -146,7 +146,7 @@ export default function AuthPage() {
                     type="password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    placeholder="At least 6 characters"
+                    placeholder="Ít nhất 6 ký tự"
                     autoComplete={
                       isRegistering ? "new-password" : "current-password"
                     }
@@ -164,9 +164,8 @@ export default function AuthPage() {
 
               {supabaseConfigError ? (
                 <p className="rounded border border-vermilion/20 bg-vermilion/10 px-4 py-3 text-sm leading-6 text-indigo">
-                  Create a local .env file from .env.example and add your
-                  Supabase Project URL plus anon public key, then restart the
-                  dev server.
+                  Tạo file .env từ .env.example và thêm Supabase Project URL
+                  cùng anon public key, sau đó khởi động lại dev server.
                 </p>
               ) : null}
 
@@ -178,12 +177,12 @@ export default function AuthPage() {
                 {submitting ? (
                   <LoaderCircle className="h-5 w-5 animate-spin" />
                 ) : null}
-                {isRegistering ? "Create account" : "Sign in"}
+                {isRegistering ? "Tạo tài khoản" : "Đăng nhập"}
               </button>
             </form>
 
             <div className="mt-7 border-t border-indigo/10 pt-5 text-center text-sm text-ink/70">
-              {isRegistering ? "Already have an account?" : "New to Mochi?"}{" "}
+              {isRegistering ? "Đã có tài khoản?" : "Chưa có tài khoản?"}{" "}
               <button
                 type="button"
                 onClick={() => {
@@ -192,7 +191,7 @@ export default function AuthPage() {
                 }}
                 className="font-semibold text-vermilion underline decoration-sakura/80 underline-offset-4 transition hover:text-indigo"
               >
-                {isRegistering ? "Sign in instead" : "Create an account"}
+                {isRegistering ? "Đăng nhập thay vào đó" : "Tạo tài khoản mới"}
               </button>
             </div>
           </div>

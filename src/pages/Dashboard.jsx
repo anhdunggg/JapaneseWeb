@@ -100,6 +100,30 @@ function DashboardSkeleton() {
   );
 }
 
+function EmptyState() {
+  return (
+    <motion.div
+      className="zen-glass p-10 text-center"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <div className="pointer-events-none font-mincho text-8xl leading-none text-indigo/10">学</div>
+      <h2 className="mt-4 font-mincho text-3xl text-indigo">Chưa có bài học nào</h2>
+      <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-ink/65">
+        Chưa có bài học nào trong hệ thống. Quản trị viên có thể thêm bài học từ trang quản trị.
+      </p>
+      <Link
+        to="/search"
+        className="zen-shimmer mt-6 inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft"
+      >
+        <Search className="h-4 w-4" />
+        Tìm kiếm nội dung
+      </Link>
+    </motion.div>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [lessons, setLessons] = useState([]);
@@ -190,13 +214,32 @@ export default function Dashboard() {
   const pageStart = (safePage - 1) * pageSize;
   const pageEnd = Math.min(pageStart + pageSize, filteredLessons.length);
   const paginatedLessons = filteredLessons.slice(pageStart, pageEnd);
-  const n5Lessons = lessons.filter((lesson) => (lesson.jlpt_level || '').toUpperCase() === 'N5');
-  const routeProgress = lessons.length ? Math.round((n5Lessons.length / lessons.length) * 100) : 0;
+
   const progressItems = Object.values(progress);
   const completedLessons = progressItems.filter((item) => item.status === 'completed').length;
   const reviewLessons = progressItems.filter((item) => item.status === 'review').length;
   const todayKey = new Date().toISOString().slice(0, 10);
   const studiedToday = progressItems.some((item) => item.last_activity_at?.slice(0, 10) === todayKey);
+
+  // Level progress based on user's actual completed lessons
+  const n5Lessons = lessons.filter((l) => (l.jlpt_level || '').toUpperCase() === 'N5');
+  const n4Lessons = lessons.filter((l) => (l.jlpt_level || '').toUpperCase() === 'N4');
+  const n3Lessons = lessons.filter((l) => (l.jlpt_level || '').toUpperCase() === 'N3');
+
+  function getLevelProgress(levelLessons) {
+    if (!levelLessons.length) return 0;
+    const done = levelLessons.filter((l) => progress[l.id]?.status === 'completed').length;
+    return Math.round((done / levelLessons.length) * 100);
+  }
+
+  const levelProgress = {
+    N5: getLevelProgress(n5Lessons),
+    N4: getLevelProgress(n4Lessons),
+    N3: getLevelProgress(n3Lessons),
+  };
+
+  const levelLessonsMap = { N5: n5Lessons, N4: n4Lessons, N3: n3Lessons };
+
   const pathLessons = sortedLessons.slice(0, 8);
   const nextPathIndex = Math.max(
     0,
@@ -254,28 +297,17 @@ export default function Dashboard() {
             </p>
             {nextLesson ? (
               <div className="mt-6 rounded border border-white/15 bg-white/10 p-4 backdrop-blur">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
-                      Tiếp tục học
-                    </p>
-                    <h3 className="mt-2 truncate font-mincho text-2xl text-washi">
-                      {getLessonTitle(nextLesson, 0)}
-                    </h3>
-                    <p className="mt-2 text-sm text-washi/70">
-                      {nextLessonProgress?.last_total
-                        ? `Điểm gần nhất: ${nextLessonProgress.last_score}/${nextLessonProgress.last_total}`
-                        : 'Chưa có điểm gần nhất'}
-                    </p>
-                  </div>
-                  <Link
-                    to={`/lessons/${nextLesson.id}`}
-                    className="zen-shimmer inline-flex shrink-0 items-center justify-center gap-2 rounded bg-washi px-5 py-3 text-sm font-semibold text-indigo shadow-soft"
-                  >
-                    Vào bài
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                </div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
+                  Tiếp tục học
+                </p>
+                <h3 className="mt-2 truncate font-mincho text-2xl text-washi">
+                  {getLessonTitle(nextLesson, 0)}
+                </h3>
+                <p className="mt-2 text-sm text-washi/70">
+                  {nextLessonProgress?.last_total
+                    ? `Điểm gần nhất: ${nextLessonProgress.last_score}/${nextLessonProgress.last_total}`
+                    : 'Chưa có điểm gần nhất'}
+                </p>
               </div>
             ) : null}
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -333,9 +365,14 @@ export default function Dashboard() {
                 Lộ trình học
               </p>
               <div className="space-y-3">
-                {['N5', 'N4', 'N3'].map((level, index) => {
-                  const levelCount = lessons.filter(
-                    (lesson) => (lesson.jlpt_level || '').toUpperCase() === level,
+                {[
+                  { level: 'N5', lessonList: n5Lessons },
+                  { level: 'N4', lessonList: n4Lessons },
+                  { level: 'N3', lessonList: n3Lessons },
+                ].map(({ level, lessonList }, index) => {
+                  const pct = levelProgress[level];
+                  const completedCount = progressItems.filter(
+                    (p) => p.status === 'completed' && lessonList.some((l) => l.id === p.lesson_id),
                   ).length;
                   const active = index === 0;
                   return (
@@ -349,15 +386,20 @@ export default function Dashboard() {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-3 text-sm">
-                        <span className="font-semibold text-indigo">Lộ trình {level}</span>
-                          <span className="text-ink/60">{levelCount} bài</span>
+                          <span className="font-semibold text-indigo">Lộ trình {level}</span>
+                          <span className="text-ink/60">{lessonList.length} bài</span>
                         </div>
                         <div className="mt-1.5 h-1.5 overflow-hidden rounded bg-mist">
                           <div
-                            className="h-full rounded bg-gradient-to-r from-vermilion to-sakura"
-                            style={{ width: `${active ? Math.max(12, routeProgress) : 8}%` }}
+                            className="h-full rounded bg-gradient-to-r from-vermilion to-sakura transition-all duration-700"
+                            style={{ width: `${lessonList.length > 0 ? Math.max(pct, 4) : 0}%` }}
                           />
                         </div>
+                        {lessonList.length > 0 && (
+                          <p className="mt-1 text-xs text-ink/50">
+                            {completedCount}/{lessonList.length} hoàn thành
+                          </p>
+                        )}
                       </div>
                     </div>
                   );
@@ -367,9 +409,9 @@ export default function Dashboard() {
 
             <div className="grid gap-3 sm:grid-cols-3 lg:col-span-6">
               {[
-                { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `${lessons.length} bài` },
+                { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `/ ${lessons.length} bài` },
                 { icon: Flame, title: 'Cần ôn', value: reviewLessons, detail: 'bài cần sửa' },
-                { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Xong' : '0/1', detail: 'mục tiêu ngày', href: '/review/today' },
+                { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Xong ✓' : '0/1', detail: 'mục tiêu ngày', href: '/review/today' },
               ].map((item) => {
                 const Icon = item.icon;
                 const content = (
@@ -501,6 +543,10 @@ export default function Dashboard() {
             </div>
           ) : null}
 
+          {!error && lessons.length === 0 && !loadingLessons ? (
+            <EmptyState />
+          ) : null}
+
           {!error && paginatedLessons.length > 0 ? (
             <>
               <div className="quest-map grid gap-5 lg:grid-cols-6">
@@ -524,12 +570,12 @@ export default function Dashboard() {
                         {complete ? (
                           <CheckCircle2 className="h-6 w-6 text-emerald-500" />
                         ) : review ? (
-                          <span className="rounded bg-vermilion/10 px-2 py-1 text-xs font-semibold text-vermilion">
+                          <span className="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">
                             Cần ôn
                           </span>
                         ) : (
-                          <span className="rounded bg-sakura/25 px-2 py-1 text-xs font-semibold text-vermilion">
-                            New
+                          <span className="rounded bg-indigo/10 px-2 py-1 text-xs font-semibold text-indigo">
+                            Mới
                           </span>
                         )}
                       </div>
@@ -568,8 +614,8 @@ export default function Dashboard() {
               </div>
               <div className="mt-6 flex flex-col gap-3 text-sm text-ink/70 sm:flex-row sm:items-center sm:justify-between">
                 <p>
-                  Hiển thị <span className="font-semibold text-indigo">{pageStart + 1}-{pageEnd}</span> /
-                  <span className="font-semibold text-indigo"> {filteredLessons.length}</span> bài
+                  Hiển thị <span className="font-semibold text-indigo">{pageStart + 1}–{pageEnd}</span> /{' '}
+                  <span className="font-semibold text-indigo">{filteredLessons.length}</span> bài
                 </p>
                 <div className="flex items-center gap-2">
                   <button

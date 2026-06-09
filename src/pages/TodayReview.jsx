@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Flame, LoaderCircle, RotateCcw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertCircle, ArrowRight, BookOpenText, CheckCircle2, Flame, LoaderCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -165,11 +166,43 @@ export default function TodayReview() {
         ) : null}
 
         {reviewItems.length === 0 ? (
-          <section className="zen-glass p-6 text-ink/70">
-            Chưa có mục nào được đánh dấu để ôn. Vào lesson và bấm “Chưa nhớ” ở từ vựng hoặc kanji để tạo danh sách ôn.
+          <section className="zen-glass p-10 text-center">
+            <div className="pointer-events-none font-mincho text-8xl leading-none text-indigo/10">復</div>
+            <h2 className="mt-4 font-mincho text-3xl text-indigo">Chưa có mục cần ôn</h2>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-ink/65">
+              Khi bạn đánh dấu “Chưa nhớ” trong phiên học, các từ sẽ xuất hiện ở đây.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                to="/dashboard"
+                className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft"
+              >
+                <BookOpenText className="h-4 w-4" />
+                Vào trang học
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </section>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <>
+            {/* Counter header */}
+            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-ink/65">
+                Đang ôn{' '}
+                <span className="font-semibold text-indigo">
+                  {reviewItems.filter((i) => i.status === 'weak').length}
+                </span>{' '}
+                mục cần ôn và{' '}
+                <span className="font-semibold text-indigo">
+                  {reviewItems.filter((i) => i.status === 'known').length}
+                </span>{' '}
+                mục đã nhớ
+              </p>
+              <p className="rounded bg-sakura/20 px-3 py-1.5 text-xs font-semibold text-indigo">
+                {reviewItems.length} mục tổng cộng
+              </p>
+            </div>
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {reviewItems.map((item) => {
               const key = `${item.item_type}:${item.item_id}`;
               const isRevealed = revealed[key];
@@ -199,7 +232,7 @@ export default function TodayReview() {
                     </div>
                     <span
                       className={`rounded px-2 py-1 text-xs font-semibold ${
-                        item.status === 'weak' ? 'bg-vermilion/10 text-vermilion' : 'bg-emerald-50 text-emerald-700'
+                        item.status === 'weak' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700'
                       }`}
                     >
                       {item.status === 'weak' ? 'Cần ôn' : 'Đã nhớ'}
@@ -242,6 +275,7 @@ export default function TodayReview() {
               );
             })}
           </div>
+          </>
         )}
       </div>
     </main>

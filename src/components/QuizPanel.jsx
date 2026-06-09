@@ -439,7 +439,7 @@ export default function QuizPanel({
                 >
                   <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-white">
                     <span className="font-mincho text-3xl text-indigo">{scorePercent}%</span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">Score</span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.12em] text-ink/50">Điểm</span>
                   </div>
                 </div>
               </div>
