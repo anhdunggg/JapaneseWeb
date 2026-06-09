@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { AlertCircle, BookOpenText, Brain, Languages, Pen, Search } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
@@ -228,10 +229,18 @@ export default function SearchPage() {
                 </span>
               </div>
               <div className="grid gap-3 md:grid-cols-2">
-                {group.items.map((item) => {
+                {group.items.map((item, index) => {
                   const Icon = item.icon;
+                  const MotionLink = motion(Link);
                   return (
-                    <Link key={item.id} to={item.href} className="zen-hover flex items-start gap-4 rounded border border-indigo/10 bg-washi/80 p-4">
+                    <MotionLink 
+                      key={item.id} 
+                      to={item.href} 
+                      className="zen-hover flex items-start gap-4 rounded border border-indigo/10 bg-washi/80 p-4"
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05, duration: 0.3 }}
+                    >
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-sakura/25 text-vermilion">
                         <Icon className="h-5 w-5" />
                       </span>
@@ -240,7 +249,7 @@ export default function SearchPage() {
                         <span className="mt-1 block truncate font-mincho text-2xl text-indigo">{item.title}</span>
                         <span className="mt-1 block truncate text-sm text-ink/65">{item.detail}</span>
                       </span>
-                    </Link>
+                    </MotionLink>
                   );
                 })}
               </div>

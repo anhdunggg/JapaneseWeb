@@ -71,20 +71,16 @@ export default function AppShell() {
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* Command Palette — hiện trên mọi màn hình */}
+            {/* Command Palette */}
             <button
               type="button"
               onClick={() => setCommandSignal((current) => current + 1)}
               aria-label="Mở tìm nhanh (Ctrl K)"
-              className="zen-hover inline-flex h-10 w-10 items-center justify-center rounded border border-indigo/10 bg-white/80 text-indigo shadow-soft"
+              className="zen-hover flex h-10 w-10 items-center justify-center gap-2 rounded border border-indigo/10 bg-white/80 px-0 text-indigo shadow-soft lg:w-auto lg:px-3"
             >
               <Command className="h-4 w-4" />
+              <span className="hidden text-xs font-semibold text-ink/55 lg:block">⌘K</span>
             </button>
-
-            {/* Ctrl K label — chỉ hiện desktop */}
-            <kbd className="hidden rounded border border-indigo/10 bg-white/80 px-2 py-1.5 text-xs font-semibold text-ink/55 shadow-soft lg:inline-flex">
-              ⌘K
-            </kbd>
 
             <button
               type="button"

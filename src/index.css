@@ -15,6 +15,22 @@
   box-sizing: border-box;
 }
 
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(44, 62, 80, 0.15);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(44, 62, 80, 0.25);
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
@@ -256,4 +272,11 @@ body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/35,
 body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/55,
 body.theme-night nav[aria-label="Breadcrumb"] .text-ink\/65 {
   color: rgba(253, 251, 247, 0.72) !important;
+}
+
+body.theme-night ::-webkit-scrollbar-thumb {
+  background: rgba(253, 251, 247, 0.15);
+}
+body.theme-night ::-webkit-scrollbar-thumb:hover {
+  background: rgba(253, 251, 247, 0.25);
 }

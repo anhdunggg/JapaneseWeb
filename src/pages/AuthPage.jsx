@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { motion } from "motion/react";
 import {
   BookOpenText,
+  Eye,
+  EyeOff,
   LoaderCircle,
   LockKeyhole,
   Mail,
@@ -38,6 +41,7 @@ export default function AuthPage() {
   const [mode, setMode] = useState("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -92,13 +96,23 @@ export default function AuthPage() {
               <Torus className="h-7 w-7 text-vermilion" />
               <span className="font-mincho text-xl">Mochi</span>
             </div>
-            <p className="relative mb-5 font-mincho text-5xl leading-tight sm:text-6xl">
+            <motion.p 
+              className="relative mb-5 font-mincho text-5xl leading-tight sm:text-6xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
               Không gian học tiếng Nhật của bạn
-            </p>
-            <p className="relative max-w-xl text-base leading-8 text-ink/80 sm:text-lg">
+            </motion.p>
+            <motion.p 
+              className="relative max-w-xl text-base leading-8 text-ink/80 sm:text-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
               Nơi yên tĩnh để tổ chức bài học, theo dõi tiến độ và
               luyện tập tập trung từ tài liệu của chính bạn.
-            </p>
+            </motion.p>
           </div>
 
           <div className="zen-glass p-7 sm:p-9">
@@ -140,10 +154,10 @@ export default function AuthPage() {
                   Mật khẩu
                 </span>
                 <span className="flex items-center gap-3 rounded border border-indigo/10 bg-washi px-4 py-3 transition focus-within:border-sakura">
-                  <LockKeyhole className="h-5 w-5 text-vermilion" />
+                  <LockKeyhole className="h-5 w-5 shrink-0 text-vermilion" />
                   <input
                     className="w-full bg-transparent text-indigo placeholder:text-ink/40 focus:outline-none"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Ít nhất 6 ký tự"
@@ -153,6 +167,14 @@ export default function AuthPage() {
                     minLength={6}
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="shrink-0 text-ink/40 transition hover:text-indigo"
+                    aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </span>
               </label>
 

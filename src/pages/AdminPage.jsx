@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'motion/react';
 import {
   AlertCircle,
   BookOpenText,
@@ -278,15 +279,18 @@ export default function AdminPage() {
               {filteredLessons.map((lesson, index) => {
                 const selected = lesson.id === selectedLessonId;
                 return (
-                  <button
+                  <motion.button
                     key={lesson.id}
                     type="button"
                     onClick={() => {
                       setSelectedLessonId(lesson.id);
                       navigate(`/admin/lessons/${lesson.id}`);
                     }}
-                    className={`flex w-full gap-3 border-b border-indigo/10 p-3 text-left last:border-b-0 ${
-                      selected ? 'bg-sakura/25' : 'hover:bg-washi'
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.02, duration: 0.2 }}
+                    className={`flex w-full gap-3 border-b border-indigo/10 p-3 text-left transition-colors last:border-b-0 ${
+                      selected ? 'bg-sakura/25' : 'hover:bg-washi/80'
                     }`}
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-white font-mincho text-indigo shadow-soft">
@@ -303,7 +307,7 @@ export default function AdminPage() {
                         Quản lý nội dung
                       </span>
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>

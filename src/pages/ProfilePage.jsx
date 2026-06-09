@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import { BarChart3, BookOpenText, CalendarDays, Flame, LoaderCircle, Mail, Target, Trophy, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
@@ -233,14 +234,20 @@ export default function ProfilePage() {
             { icon: Flame, label: 'Từ còn yếu', value: stats.weak },
             { icon: Trophy, label: 'Đã thuộc', value: stats.known },
             { icon: BarChart3, label: 'Điểm trung bình', value: `${stats.avg}%` },
-          ].map((item) => {
+          ].map((item, index) => {
             const Icon = item.icon;
             return (
-              <article key={item.label} className="zen-glass zen-hover p-5">
+              <motion.article 
+                key={item.label} 
+                className="zen-glass zen-hover p-5"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+              >
                 <Icon className="h-5 w-5 text-vermilion" />
                 <p className="mt-4 font-mincho text-4xl">{item.value}</p>
                 <p className="mt-1 text-sm font-semibold text-ink/65">{item.label}</p>
-              </article>
+              </motion.article>
             );
           })}
         </section>
@@ -352,14 +359,20 @@ export default function ProfilePage() {
             </p>
             <h2 className="font-mincho text-3xl">Gần đây</h2>
             <div className="mt-5 space-y-2">
-              {activities.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between gap-4 rounded bg-washi px-4 py-3 text-sm">
+              {activities.map((activity, index) => (
+                <motion.div 
+                  key={activity.id} 
+                  className="zen-hover flex items-center justify-between gap-4 rounded border border-indigo/10 bg-washi px-4 py-3 text-sm"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                >
                   <div>
                     <p className="font-semibold text-indigo">{activity.type}</p>
                     <p className="mt-1 text-xs text-ink/60">{formatDate(activity.date)}</p>
                   </div>
                   <span className="rounded bg-sakura/25 px-3 py-1 font-semibold text-indigo">{activity.score}</span>
-                </div>
+                </motion.div>
               ))}
               {activities.length === 0 ? (
                 <p className="rounded bg-washi p-4 text-sm text-ink/65">Chưa có hoạt động luyện tập.</p>

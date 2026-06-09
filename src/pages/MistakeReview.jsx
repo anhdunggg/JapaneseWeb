@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, LoaderCircle, XCircle } from 'lucide-react';
+import { motion } from 'motion/react';
+import { AlertCircle, ArrowRight, BookOpenText, CheckCircle2, LoaderCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
 
@@ -159,13 +160,33 @@ export default function MistakeReview() {
         ) : null}
 
         {mistakes.length === 0 ? (
-          <div className="zen-glass p-6 text-ink/70">
-            Chưa có câu sai nào trong lịch sử gần đây.
-          </div>
+          <section className="zen-glass p-10 text-center">
+            <div className="pointer-events-none font-mincho text-8xl leading-none text-indigo/10">完璧</div>
+            <h2 className="mt-4 font-mincho text-3xl text-indigo">Bạn thật xuất sắc!</h2>
+            <p className="mx-auto mt-3 max-w-sm text-sm leading-7 text-ink/65">
+              Không có lỗi sai nào trong thời gian gần đây. Hãy tiếp tục phát huy nhé!
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                to="/dashboard"
+                className="zen-shimmer inline-flex items-center gap-2 rounded bg-indigo px-5 py-3 text-sm font-semibold text-washi shadow-soft"
+              >
+                <BookOpenText className="h-4 w-4" />
+                Vào trang học
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </section>
         ) : (
           <div className="space-y-4">
             {mistakes.map((mistake, index) => (
-              <article key={mistake.key} className="zen-glass zen-hover p-5">
+              <motion.article 
+                key={mistake.key} 
+                className="zen-glass zen-hover p-5"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+              >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">
@@ -177,22 +198,28 @@ export default function MistakeReview() {
                   </div>
                   <Link
                     to={`/lessons/${mistake.lessonId}/exercises`}
-                    className="rounded bg-indigo px-3 py-2 text-sm font-semibold text-washi"
+                    className="rounded bg-indigo px-3 py-2 text-sm font-semibold text-washi transition hover:bg-indigo/90"
                   >
                     Luyện lại
                   </Link>
                 </div>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <p className="rounded bg-vermilion/10 p-3 text-sm">
-                    <span className="font-semibold text-indigo">Bạn chọn: </span>
-                    {mistake.userAnswer}
-                  </p>
-                  <p className="rounded bg-emerald-50 p-3 text-sm">
-                    <span className="font-semibold text-indigo">Đáp án: </span>
-                    {mistake.answer}
-                  </p>
+                  <div className="flex items-start gap-2 rounded bg-vermilion/10 p-3 text-sm">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-vermilion" />
+                    <p>
+                      <span className="font-semibold text-indigo">Bạn chọn: </span>
+                      {mistake.userAnswer}
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 rounded bg-emerald-50 p-3 text-sm">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <p>
+                      <span className="font-semibold text-indigo">Đáp án: </span>
+                      {mistake.answer}
+                    </p>
+                  </div>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         )}

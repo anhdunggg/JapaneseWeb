@@ -13,9 +13,11 @@ import {
   Shuffle,
   Trophy,
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { supabase } from '../supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { generateQuestionBank } from '../lib/geminiQuiz';
+import { playCompleteSound, playErrorSound, playSuccessSound } from '../lib/sounds';
 
 const QUIZ_SIZE = 8;
 
@@ -369,7 +371,27 @@ export default function QuizPanel({
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
-                onClick={() => setShowResult(true)}
+                onClick={() => {
+                  setShowResult(true);
+                  // Tính điểm tạm thời vì useMemo score có thể chưa cập nhật
+                  let currentScore = 0;
+                  quiz.questions.forEach((q) => {
+                    if (normalizeAnswer(answers[q.id]) === normalizeAnswer(q.answer)) currentScore++;
+                  });
+                  
+                  if (currentCorrect) {
+                    playSuccessSound();
+                  } else {
+                    playErrorSound();
+                  }
+
+                  if (currentScore === quiz.questions.length) {
+                    setTimeout(() => {
+                      playCompleteSound();
+                      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                    }, 400);
+                  }
+                }}
                 className="zen-shimmer rounded bg-vermilion px-4 py-3 text-sm font-semibold text-white shadow-soft"
               >
                 Kiểm tra đáp án

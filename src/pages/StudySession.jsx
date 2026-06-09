@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, BookOpenText, CheckCircle2, LoaderCircle, RotateCcw, Trophy } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabaseClient';
+import { playCompleteSound, playErrorSound, playSuccessSound } from '../lib/sounds';
 
 function labelForCard(card) {
   return card.item_type === 'kanji' ? card.character || 'Kanji' : card.word || 'Từ vựng';
@@ -169,8 +171,16 @@ export default function StudySession() {
     });
 
     toast.success(status === 'known' ? 'Đã đánh dấu Nhớ rồi.' : 'Đã đưa vào Ôn hôm nay.');
-    if (status === 'known') setKnownCount((c) => c + 1);
-    else setWeakCount((c) => c + 1);
+    
+    let newKnown = knownCount;
+    if (status === 'known') {
+      newKnown += 1;
+      setKnownCount(newKnown);
+      playSuccessSound();
+    } else {
+      setWeakCount((c) => c + 1);
+      playErrorSound();
+    }
 
     setFeedback(status);
     window.setTimeout(() => {
@@ -179,6 +189,10 @@ export default function StudySession() {
       const next = index + 1;
       if (next >= cards.length) {
         setFinished(true);
+        if (newKnown === cards.length) {
+          playCompleteSound();
+          confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+        }
       } else {
         setIndex(next);
       }

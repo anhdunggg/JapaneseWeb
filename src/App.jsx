@@ -17,14 +17,17 @@ const TodayReview = lazy(() => import('./pages/TodayReview'));
 function RouteFallback() {
   return (
     <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
-      <div className="zen-glass w-full max-w-md p-5">
-        <div className="mb-4 h-5 w-36 animate-pulse rounded bg-mist" />
-        <div className="grid gap-3">
-          <div className="h-20 animate-pulse rounded bg-mist" />
-          <div className="h-20 animate-pulse rounded bg-mist" />
-          <div className="h-20 animate-pulse rounded bg-mist" />
+      <div className="flex flex-col items-center">
+        <div className="relative mb-4 flex h-20 w-20 items-center justify-center">
+          <div className="absolute inset-0 animate-ping rounded-full bg-sakura/20" style={{ animationDuration: '2s' }} />
+          <div className="absolute inset-2 animate-pulse rounded-full bg-vermilion/20" />
+          <div className="relative flex h-14 w-14 items-center justify-center rounded-full bg-washi shadow-soft">
+            <span className="font-mincho text-3xl text-vermilion">学</span>
+          </div>
         </div>
-        <p className="mt-4 text-sm font-semibold text-ink/60">Đang tải trang...</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink/50 animate-pulse">
+          Đang tải
+        </p>
       </div>
     </main>
   );

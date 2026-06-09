@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { AlertCircle, ArrowRight, BookOpenText, CheckCircle2, Flame, LoaderCircle, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -203,11 +204,17 @@ export default function TodayReview() {
               </p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {reviewItems.map((item) => {
+            {reviewItems.map((item, index) => {
               const key = `${item.item_type}:${item.item_id}`;
               const isRevealed = revealed[key];
               return (
-                <article key={key} className="zen-glass zen-hover p-5">
+                <motion.article 
+                  key={key} 
+                  className="zen-glass zen-hover p-5"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                >
                   {item.item_type === 'kanji' ? (
                     <KanjiTile character={labelForItem(item)} />
                   ) : item.image_url ? (
@@ -271,7 +278,7 @@ export default function TodayReview() {
                       Ôn lại
                     </button>
                   </div>
-                </article>
+                </motion.article>
               );
             })}
           </div>
