@@ -38,6 +38,68 @@ function getSortableLessonNumber(lesson, index) {
   return Number.isNaN(parsed) ? index + 1 : parsed;
 }
 
+function DashboardSkeleton() {
+  return (
+    <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 border-b border-indigo/10 pb-6">
+          <div className="skeleton-line h-4 w-32" />
+          <div className="skeleton-line mt-4 h-10 w-72 max-w-full" />
+          <div className="skeleton-line mt-3 h-4 w-96 max-w-full" />
+        </div>
+        <section className="grid gap-5 lg:grid-cols-12">
+          <div className="zen-glass p-8 lg:col-span-7">
+            <div className="skeleton-line h-4 w-28" />
+            <div className="skeleton-line mt-5 h-12 w-3/4" />
+            <div className="skeleton-line mt-4 h-4 w-full" />
+            <div className="skeleton-line mt-3 h-4 w-2/3" />
+            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="rounded border border-indigo/10 bg-washi p-4">
+                  <div className="skeleton-line h-3 w-16" />
+                  <div className="skeleton-line mt-3 h-5 w-24" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="zen-glass p-6 lg:col-span-5">
+            <div className="skeleton-line h-4 w-28" />
+            <div className="mt-6 space-y-5">
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="flex items-center gap-4">
+                  <div className="skeleton-line h-12 w-12 rounded-full" />
+                  <div className="flex-1">
+                    <div className="skeleton-line h-4 w-32" />
+                    <div className="skeleton-line mt-3 h-2 w-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="zen-glass p-6 lg:col-span-4">
+              <div className="skeleton-line h-5 w-5" />
+              <div className="skeleton-line mt-5 h-10 w-20" />
+              <div className="skeleton-line mt-4 h-4 w-28" />
+              <div className="skeleton-line mt-3 h-4 w-36" />
+            </div>
+          ))}
+        </section>
+        <div className="mt-8 grid gap-5 lg:grid-cols-3">
+          {[0, 1, 2, 3, 4, 5].map((item) => (
+            <div key={item} className="zen-glass p-6">
+              <div className="skeleton-line h-4 w-16" />
+              <div className="skeleton-line mt-4 h-8 w-3/4" />
+              <div className="skeleton-line mt-4 h-4 w-full" />
+              <div className="skeleton-line mt-3 h-4 w-2/3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [lessons, setLessons] = useState([]);
@@ -128,7 +190,6 @@ export default function Dashboard() {
   const pageStart = (safePage - 1) * pageSize;
   const pageEnd = Math.min(pageStart + pageSize, filteredLessons.length);
   const paginatedLessons = filteredLessons.slice(pageStart, pageEnd);
-  const nextLesson = filteredLessons[0] || sortedLessons[0];
   const n5Lessons = lessons.filter((lesson) => (lesson.jlpt_level || '').toUpperCase() === 'N5');
   const routeProgress = lessons.length ? Math.round((n5Lessons.length / lessons.length) * 100) : 0;
   const progressItems = Object.values(progress);
@@ -141,6 +202,19 @@ export default function Dashboard() {
     0,
     pathLessons.findIndex((lesson) => progress[lesson.id]?.status !== 'completed'),
   );
+  const latestProgress = progressItems
+    .filter((item) => item.status !== 'completed')
+    .sort((first, second) => new Date(second.last_activity_at || 0) - new Date(first.last_activity_at || 0))[0];
+  const nextLesson =
+    sortedLessons.find((lesson) => lesson.id === latestProgress?.lesson_id) ||
+    pathLessons[nextPathIndex] ||
+    filteredLessons[0] ||
+    sortedLessons[0];
+  const nextLessonProgress = nextLesson ? progress[nextLesson.id] : null;
+
+  if (loadingLessons && lessons.length === 0) {
+    return <DashboardSkeleton />;
+  }
 
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
@@ -155,9 +229,9 @@ export default function Dashboard() {
           </div>
         </header>
 
-        <section className="mb-8 grid gap-5 lg:grid-cols-12">
+        <section className="mb-8 grid gap-5">
           <motion.article
-            className="quest-hero zen-glass p-8 text-washi lg:col-span-7"
+            className="quest-hero zen-glass p-8 text-washi"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut' }}
@@ -178,6 +252,32 @@ export default function Dashboard() {
               Ôn nhanh lý thuyết, làm một quiz ngắn, sau đó quay lại các câu sai.
               Tập trung vào một bài mỗi lần để giữ nhịp học nhẹ nhưng đều.
             </p>
+            {nextLesson ? (
+              <div className="mt-6 rounded border border-white/15 bg-white/10 p-4 backdrop-blur">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sakura">
+                      Tiếp tục học
+                    </p>
+                    <h3 className="mt-2 truncate font-mincho text-2xl text-washi">
+                      {getLessonTitle(nextLesson, 0)}
+                    </h3>
+                    <p className="mt-2 text-sm text-washi/70">
+                      {nextLessonProgress?.last_total
+                        ? `Điểm gần nhất: ${nextLessonProgress.last_score}/${nextLessonProgress.last_total}`
+                        : 'Chưa có điểm gần nhất'}
+                    </p>
+                  </div>
+                  <Link
+                    to={`/lessons/${nextLesson.id}`}
+                    className="zen-shimmer inline-flex shrink-0 items-center justify-center gap-2 rounded bg-washi px-5 py-3 text-sm font-semibold text-indigo shadow-soft"
+                  >
+                    Vào bài
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            ) : null}
             <div className="mt-6 grid gap-3 sm:grid-cols-3">
               {['Ôn lý thuyết', 'Làm quiz ngắn', 'Sửa câu sai'].map((step, index) => (
                 <div key={step} className="rounded border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
@@ -221,95 +321,99 @@ export default function Dashboard() {
             </div>
           </motion.article>
 
-          <motion.article
-            className="zen-glass p-6 lg:col-span-5"
+          <motion.aside
+            className="grid gap-4 lg:grid-cols-12"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08, duration: 0.45, ease: 'easeOut' }}
           >
-            <p className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
-              <Map className="h-4 w-4" />
-              Lộ trình học
-            </p>
-            <div className="space-y-4">
-              {['N5', 'N4', 'N3'].map((level, index) => {
-                const levelCount = lessons.filter(
-                  (lesson) => (lesson.jlpt_level || '').toUpperCase() === level,
-                ).length;
-                const active = index === 0;
-                return (
-                  <div key={level} className="flex items-center gap-4">
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-full font-mincho text-lg shadow-soft ${
-                        active ? 'bg-indigo text-washi' : 'bg-washi text-indigo'
-                      }`}
-                    >
-                      {level}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-3 text-sm">
-                      <span className="font-semibold text-indigo">Lộ trình {level}</span>
-                        <span className="text-ink/60">{levelCount} bài</span>
+            <article className="zen-glass p-5 lg:col-span-6">
+              <p className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                <Map className="h-4 w-4" />
+                Lộ trình học
+              </p>
+              <div className="space-y-3">
+                {['N5', 'N4', 'N3'].map((level, index) => {
+                  const levelCount = lessons.filter(
+                    (lesson) => (lesson.jlpt_level || '').toUpperCase() === level,
+                  ).length;
+                  const active = index === 0;
+                  return (
+                    <div key={level} className="flex items-center gap-3 rounded border border-indigo/10 bg-washi/70 p-3">
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-mincho text-base shadow-soft ${
+                          active ? 'bg-indigo text-washi' : 'bg-washi text-indigo'
+                        }`}
+                      >
+                        {level}
                       </div>
-                      <div className="mt-2 h-2 overflow-hidden rounded bg-mist">
-                        <div
-                          className="h-full rounded bg-gradient-to-r from-vermilion to-sakura"
-                          style={{ width: `${active ? Math.max(12, routeProgress) : 8}%` }}
-                        />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                        <span className="font-semibold text-indigo">Lộ trình {level}</span>
+                          <span className="text-ink/60">{levelCount} bài</span>
+                        </div>
+                        <div className="mt-1.5 h-1.5 overflow-hidden rounded bg-mist">
+                          <div
+                            className="h-full rounded bg-gradient-to-r from-vermilion to-sakura"
+                            style={{ width: `${active ? Math.max(12, routeProgress) : 8}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  );
+                })}
+              </div>
+            </article>
+
+            <div className="grid gap-3 sm:grid-cols-3 lg:col-span-6">
+              {[
+                { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `${lessons.length} bài` },
+                { icon: Flame, title: 'Cần ôn', value: reviewLessons, detail: 'bài cần sửa' },
+                { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Xong' : '0/1', detail: 'mục tiêu ngày', href: '/review/today' },
+              ].map((item) => {
+                const Icon = item.icon;
+                const content = (
+                  <>
+                    <Icon className="h-4 w-4 text-vermilion" />
+                    <p className="mt-3 font-mincho text-3xl leading-none">{item.value}</p>
+                    <p className="mt-2 text-sm font-semibold text-indigo">{item.title}</p>
+                    <p className="mt-1 truncate text-xs text-ink/65">{item.detail}</p>
+                  </>
+                );
+                return item.href ? (
+                  <Link key={item.title} to={item.href} className="zen-glass zen-hover p-4">
+                    {content}
+                  </Link>
+                ) : (
+                  <article key={item.title} className="zen-glass zen-hover p-4">
+                    {content}
+                  </article>
                 );
               })}
             </div>
-          </motion.article>
-
-          {[
-            { icon: Trophy, title: 'Hoàn thành', value: completedLessons, detail: `${lessons.length} bài trong lộ trình` },
-            { icon: Flame, title: 'Cần ôn', value: reviewLessons, detail: 'bài có câu sai gần đây' },
-            { icon: CalendarDays, title: 'Hôm nay', value: studiedToday ? 'Xong' : '0/1', detail: 'mục tiêu một bài/ngày', href: '/review/today' },
-          ].map((item) => {
-            const Icon = item.icon;
-            const content = (
-              <>
-                <Icon className="h-5 w-5 text-vermilion" />
-                <p className="mt-4 font-mincho text-4xl">{item.value}</p>
-                <p className="mt-2 font-semibold text-indigo">{item.title}</p>
-                <p className="mt-1 text-sm text-ink/65">{item.detail}</p>
-              </>
-            );
-            return item.href ? (
-              <Link key={item.title} to={item.href} className="zen-glass zen-hover p-6 lg:col-span-4">
-                {content}
-              </Link>
-            ) : (
-              <article key={item.title} className="zen-glass zen-hover p-6 lg:col-span-4">
-                {content}
-              </article>
-            );
-          })}
+          </motion.aside>
         </section>
 
         {pathLessons.length > 0 ? (
           <motion.section
-            className="zen-glass mb-8 p-5"
+            className="zen-glass mb-7 p-4"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, duration: 0.4, ease: 'easeOut' }}
           >
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
                   <Layers3 className="h-4 w-4" />
                   Lộ trình học
                 </p>
-                <h2 className="mt-2 font-mincho text-3xl text-indigo">Đường học gần nhất</h2>
+                <h2 className="mt-1 font-mincho text-2xl text-indigo">Đường học gần nhất</h2>
               </div>
               <p className="text-sm font-semibold text-ink/60">
                 {completedLessons}/{lessons.length} bài đã hoàn thành
               </p>
             </div>
-            <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-8">
+            <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-8">
               {pathLessons.map((lesson, index) => {
                 const lessonProgress = progress[lesson.id];
                 const completed = lessonProgress?.status === 'completed';
@@ -318,7 +422,7 @@ export default function Dashboard() {
                   <Link
                     key={lesson.id}
                     to={`/lessons/${lesson.id}`}
-                    className={`zen-hover group rounded border p-4 text-center transition ${
+                    className={`zen-hover group rounded border px-3 py-3 text-center transition ${
                       completed
                         ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                         : current
@@ -326,13 +430,13 @@ export default function Dashboard() {
                           : 'border-indigo/10 bg-washi text-ink/65'
                     }`}
                   >
-                    <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-white font-mincho text-lg shadow-soft">
+                    <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-white font-mincho text-base shadow-soft">
                       {completed ? <CheckCircle2 className="h-5 w-5" /> : getLessonNumber(lesson, index)}
                     </span>
-                    <span className="mt-3 block truncate text-xs font-semibold">
+                    <span className="mt-2 block truncate text-xs font-semibold">
                       {getLessonTitle(lesson, index)}
                     </span>
-                    <span className="mt-2 block text-[11px] uppercase tracking-[0.14em]">
+                    <span className="mt-1 block text-[10px] uppercase tracking-[0.12em]">
                       {completed ? 'Đã xong' : current ? 'Tiếp theo' : 'Chưa mở'}
                     </span>
                   </Link>
@@ -410,7 +514,7 @@ export default function Dashboard() {
                   return (
                     <motion.article
                       key={lesson.id ?? getLessonTitle(lesson, absoluteIndex)}
-                      className={`quest-node zen-glass zen-hover group p-6 ${span}`}
+                      className={`quest-node zen-glass zen-hover group p-5 ${span}`}
                       initial={{ opacity: 0, y: 14 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: '-40px' }}
@@ -436,13 +540,13 @@ export default function Dashboard() {
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">
                           {lesson.jlpt_level || lesson.level || lesson.category || 'Bài học'}
                         </p>
-                        <h3 className="mt-3 font-mincho text-2xl text-indigo">
+                        <h3 className="mt-2 font-mincho text-2xl text-indigo">
                           {getLessonTitle(lesson, absoluteIndex)}
                         </h3>
-                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-ink/75">
+                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-ink/75">
                           {getLessonDetail(lesson)}
                         </p>
-                        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                           {lessonProgress?.last_total ? (
                             <p className="rounded bg-washi px-3 py-2 text-sm font-semibold text-indigo">
                               Điểm gần nhất: {lessonProgress.last_score}/{lessonProgress.last_total}

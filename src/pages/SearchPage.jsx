@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertCircle, BookOpenText, Brain, Languages, LoaderCircle, Search } from 'lucide-react';
+import { AlertCircle, BookOpenText, Brain, Languages, Search } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 
 function includes(value, query) {
@@ -9,6 +9,38 @@ function includes(value, query) {
 
 function lessonTitle(lesson) {
   return lesson.title || lesson.name || lesson.lesson_title || 'Bài học';
+}
+
+function SearchSkeleton() {
+  return (
+    <div className="space-y-6">
+      {[0, 1, 2].map((group) => (
+        <section key={group} className="zen-glass p-4 sm:p-5">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <div className="flex-1">
+              <div className="skeleton-line h-3 w-20" />
+              <div className="skeleton-line mt-3 h-4 w-72 max-w-full" />
+            </div>
+            <div className="skeleton-line h-7 w-20" />
+          </div>
+          <div className="grid gap-3 md:grid-cols-2">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="rounded border border-indigo/10 bg-washi/80 p-4">
+                <div className="flex items-start gap-4">
+                  <div className="skeleton-line h-11 w-11" />
+                  <div className="min-w-0 flex-1">
+                    <div className="skeleton-line h-3 w-16" />
+                    <div className="skeleton-line mt-3 h-7 w-44 max-w-full" />
+                    <div className="skeleton-line mt-3 h-4 w-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
 }
 
 export default function SearchPage() {
@@ -112,6 +144,17 @@ export default function SearchPage() {
     return [...lessonItems, ...vocabularyItems, ...grammarItems, ...kanjiItems].slice(0, 80);
   }, [grammar, kanji, lessons, query, vocabulary]);
 
+  const groupedResults = useMemo(
+    () =>
+      [
+        { title: 'Bài học', description: 'Các lesson có tiêu đề hoặc mô tả trùng từ khóa.', items: results.filter((item) => item.type === 'Bài học') },
+        { title: 'Từ vựng', description: 'Từ, cách đọc, romaji hoặc nghĩa khớp với nội dung tìm kiếm.', items: results.filter((item) => item.type === 'Từ vựng') },
+        { title: 'Kanji', description: 'Chữ Hán, âm đọc, nghĩa hoặc gợi nhớ liên quan.', items: results.filter((item) => item.type === 'Kanji') },
+        { title: 'Ngữ pháp', description: 'Mẫu câu, cấu trúc và ví dụ trong kho bài học.', items: results.filter((item) => item.type === 'Ngữ pháp') },
+      ].filter((group) => group.items.length > 0),
+    [results],
+  );
+
   return (
     <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
       <div className="mx-auto max-w-5xl">
@@ -134,10 +177,7 @@ export default function SearchPage() {
         </section>
 
         {loading ? (
-          <div className="zen-glass flex items-center gap-3 p-5 text-sm">
-            <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
-            Đang tải dữ liệu tìm kiếm...
-          </div>
+          <SearchSkeleton />
         ) : null}
 
         {error ? (
@@ -151,22 +191,37 @@ export default function SearchPage() {
           <div className="zen-glass p-5 text-sm text-ink/70">Không tìm thấy nội dung phù hợp.</div>
         ) : null}
 
-        <div className="space-y-3">
-          {results.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.id} to={item.href} className="zen-glass zen-hover flex items-start gap-4 p-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-sakura/25 text-vermilion">
-                  <Icon className="h-5 w-5" />
+        <div className="space-y-6">
+          {groupedResults.map((group) => (
+            <section key={group.title} className="zen-glass p-4 sm:p-5">
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-vermilion">{group.title}</p>
+                  <p className="mt-1 text-sm text-ink/60">{group.description}</p>
+                </div>
+                <span className="w-fit rounded-full bg-sakura/25 px-3 py-1 text-xs font-semibold text-indigo">
+                  {group.items.length} kết quả
                 </span>
-                <span className="min-w-0">
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">{item.type}</span>
-                  <span className="mt-1 block font-mincho text-2xl text-indigo">{item.title}</span>
-                  <span className="mt-1 block truncate text-sm text-ink/65">{item.detail}</span>
-                </span>
-              </Link>
-            );
-          })}
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {group.items.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link key={item.id} to={item.href} className="zen-hover flex items-start gap-4 rounded border border-indigo/10 bg-washi/80 p-4">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-sakura/25 text-vermilion">
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="text-xs font-semibold uppercase tracking-[0.14em] text-vermilion">{item.type}</span>
+                        <span className="mt-1 block truncate font-mincho text-2xl text-indigo">{item.title}</span>
+                        <span className="mt-1 block truncate text-sm text-ink/65">{item.detail}</span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       </div>
     </main>

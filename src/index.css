@@ -156,14 +156,14 @@ a:focus-visible {
 
   .quest-map::before {
     position: absolute;
-    inset: 1.25rem auto 1.25rem 2.25rem;
+    inset: 1rem auto 1rem 2rem;
     width: 2px;
     content: "";
     background: linear-gradient(to bottom, rgba(230, 126, 34, 0.35), rgba(255, 183, 197, 0.2));
   }
 
   .quest-node {
-    min-height: 220px;
+    min-height: 178px;
   }
 
   .quiz-focus-card {

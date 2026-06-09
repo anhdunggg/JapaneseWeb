@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ImageOff,
   Languages,
-  LoaderCircle,
   Settings,
   Sparkles,
 } from 'lucide-react';
@@ -130,6 +129,61 @@ function ExamplesList({ examples, mode = 'sentence' }) {
   );
 }
 
+function LessonDetailSkeleton() {
+  return (
+    <main className="min-h-screen px-5 py-6 text-indigo sm:px-8">
+      <div className="mx-auto max-w-6xl">
+        <section className="zen-glass mb-8 p-7">
+          <div className="skeleton-line h-4 w-28" />
+          <div className="skeleton-line mt-5 h-10 w-80 max-w-full" />
+          <div className="skeleton-line mt-5 h-4 w-full max-w-3xl" />
+          <div className="skeleton-line mt-3 h-4 w-2/3 max-w-2xl" />
+        </section>
+        <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
+          <div>
+            <section className="zen-glass mb-8 p-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[0, 1, 2].map((item) => (
+                  <div key={item} className="rounded border border-indigo/10 bg-washi/80 p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="skeleton-line h-11 w-11" />
+                      <div className="flex-1">
+                        <div className="skeleton-line h-8 w-14" />
+                        <div className="skeleton-line mt-3 h-4 w-20" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {[0, 1, 2, 3, 4, 5].map((item) => (
+                <article key={item} className="zen-glass p-5">
+                  <div className="skeleton-line h-40 w-full" />
+                  <div className="skeleton-line mt-5 h-9 w-28" />
+                  <div className="skeleton-line mt-4 h-4 w-40" />
+                  <div className="skeleton-line mt-5 h-10 w-24" />
+                </article>
+              ))}
+            </div>
+          </div>
+          <aside className="hidden xl:block">
+            <div className="zen-glass p-5">
+              <div className="skeleton-line h-4 w-32" />
+              <div className="skeleton-line mt-4 h-8 w-40" />
+              <div className="mt-6 space-y-3">
+                {[0, 1, 2, 3].map((item) => (
+                  <div key={item} className="skeleton-line h-16 w-full" />
+                ))}
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 export default function LessonDetail() {
   const { lessonId } = useParams();
   const { isAdmin, user } = useAuth();
@@ -148,6 +202,14 @@ export default function LessonDetail() {
     { id: 'grammar', label: 'Ngữ pháp', detail: `${grammar.length} điểm`, icon: Brain },
     { id: 'quiz', label: 'Quiz', detail: 'Luyện tập', icon: CheckCircle2 },
   ];
+  const knownVocabulary = vocabulary.filter((item) => reviewStatus[`vocabulary:${item.id}`] === 'known').length;
+  const weakVocabulary = vocabulary.filter((item) => reviewStatus[`vocabulary:${item.id}`] === 'weak').length;
+  const knownKanji = kanji.filter((item) => reviewStatus[`kanji:${item.id}`] === 'known').length;
+  const weakKanji = kanji.filter((item) => reviewStatus[`kanji:${item.id}`] === 'weak').length;
+  const reviewableTotal = vocabulary.length + kanji.length;
+  const knownTotal = knownVocabulary + knownKanji;
+  const weakTotal = weakVocabulary + weakKanji;
+  const lessonProgressPercent = reviewableTotal ? Math.round((knownTotal / reviewableTotal) * 100) : 0;
 
   function toggleCard(id) {
     setRevealedCards((current) => ({ ...current, [id]: !current[id] }));
@@ -237,14 +299,7 @@ export default function LessonDetail() {
   }
 
   if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 text-indigo">
-        <div className="zen-glass flex items-center gap-3 px-5 py-4">
-          <LoaderCircle className="h-5 w-5 animate-spin text-vermilion" />
-          <span className="text-sm font-medium">Đang mở bài học...</span>
-        </div>
-      </main>
-    );
+    return <LessonDetailSkeleton />;
   }
 
   return (
@@ -274,6 +329,65 @@ export default function LessonDetail() {
                 </div>
                 <div className="zen-hover flex h-14 w-14 items-center justify-center rounded bg-sakura/30">
                   <Sparkles className="h-7 w-7 text-vermilion" />
+                </div>
+              </div>
+            </motion.section>
+
+            <div className="sticky top-20 z-30 mb-6 rounded border border-indigo/10 bg-washi/90 p-2 shadow-soft backdrop-blur xl:hidden">
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  to={`/lessons/${lessonId}/study`}
+                  className="zen-shimmer inline-flex items-center justify-center gap-2 rounded bg-indigo px-3 py-3 text-sm font-semibold text-washi"
+                >
+                  Phiên học
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  to={`/lessons/${lessonId}/exercises`}
+                  className="inline-flex items-center justify-center gap-2 rounded border border-indigo/10 bg-white px-3 py-3 text-sm font-semibold text-indigo"
+                >
+                  Bài tập
+                  <CheckCircle2 className="h-4 w-4 text-vermilion" />
+                </Link>
+              </div>
+            </div>
+
+            <motion.section
+              className="zen-glass mb-8 p-5"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.36, ease: 'easeOut' }}
+            >
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-vermilion">
+                    Tiến độ bài học
+                  </p>
+                  <div className="mt-3 h-3 overflow-hidden rounded-full bg-mist">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-vermilion to-sakura transition-all duration-500"
+                      style={{ width: `${lessonProgressPercent}%` }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-ink/65">
+                    {reviewableTotal
+                      ? `${knownTotal}/${reviewableTotal} mục đã đánh dấu nhớ`
+                      : 'Bài này chưa có từ vựng hoặc kanji để theo dõi tiến độ'}
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-3 sm:min-w-[360px]">
+                  {[
+                    { label: 'Hoàn thành', value: `${lessonProgressPercent}%` },
+                    { label: 'Đã nhớ', value: knownTotal },
+                    { label: 'Cần ôn', value: weakTotal },
+                  ].map((item) => (
+                    <div key={item.label} className="rounded border border-indigo/10 bg-washi p-4 text-center">
+                      <p className="font-mincho text-3xl leading-none text-indigo">{item.value}</p>
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink/55">
+                        {item.label}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.section>
